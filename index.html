@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ديليفري الأتارب</title>
+<style>
+:root{--green:#16834a;--bg:#f5f7f6;--ink:#17211b;--muted:#66736b;--card:#fff;--line:#e2e8e4}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--green);color:white;padding:20px 16px 16px;position:sticky;top:0;z-index:2;box-shadow:0 2px 8px #0001}
+header h1{font-size:23px;margin:0 0 5px}header p{margin:0;font-size:13px;opacity:.9}
+nav{display:flex;gap:8px;padding:12px;overflow:auto;background:white;border-bottom:1px solid var(--line);position:sticky;top:83px;z-index:1}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 14px}
+nav button{background:#edf3ef;color:#234332;white-space:nowrap}nav button.active,.primary{background:var(--green);color:white}
+main{max-width:900px;margin:auto;padding:16px}.intro{background:#e8f5ec;border-radius:16px;padding:16px;margin-bottom:16px}.intro h2{margin:0 0 6px;font-size:19px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 6px #00004}.emoji{font-size:35px}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700}.small{padding:7px 10px;font-size:13px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #ccd7d0;border-radius:10px;margin:5px 0 12px;background:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#fff4d8;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#e6f7eb;padding:12px;border-radius:12px}.tabs-title{margin:5px 0 14px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+</style>
+</head>
+<body>
+<header><h1>🍽️ ديليفري الأتارب</h1><p>مطاعم ومتاجر منطقتك — اطلب بسهولة</p></header>
+<nav>
+<button class="active" data-view="stores">المطاعم والمتاجر</button>
+<button data-view="cart">🛒 السلة <span id="cartCount">0</span></button>
+<button data-view="orders">طلباتي</button>
+<button data-view="admin">الإدارة</button>
+</nav>
+<main>
+<section id="storesView">
+<div class="intro"><h2>أهلاً فيك 👋</h2><div>اختار مطعمك أو متجرك، أضف المنتجات للسلة، وابعث طلبك.</div><p class="muted">هذه نسخة تجريبية أولية. الأسعار والبيانات أمثلة ويمكن تعديلها.</p></div>
+<h2 class="tabs-title">المطاعم والمتاجر</h2><div class="grid" id="stores"></div>
+<hr><h2 class="tabs-title">المنتجات</h2><div class="grid" id="products"></div>
+</section>
+<section id="cartView" class="hidden"><h2>🛒 سلة المشتريات</h2><div class="panel" id="cartItems"></div><div class="panel"><h3>بيانات التوصيل</h3><form id="checkout">
+<label>الاسم الكامل</label><input name="name" required placeholder="اسمك">
+<label>رقم الهاتف</label><input name="phone" required inputmode="tel" placeholder="رقم للتواصل">
+<label>العنوان بالتفصيل</label><input name="address" required placeholder="الحي، الشارع، أقرب نقطة دالة">
+<label>ملاحظات (اختياري)</label><textarea name="notes" placeholder="أي تفاصيل إضافية"></textarea>
+<div class="row"><strong>المجموع: <span id="total">0</span> ل.س</strong><button class="primary" type="submit">تأكيد الطلب التجريبي</button></div>
+</form><div class="notice">تنبيه: الطلبات في هذه النسخة تُحفظ على نفس الجهاز والمتصفح فقط، ولا تصل تلقائياً لصاحب المتجر.</div></div></section>
+<section id="ordersView" class="hidden"><h2>📦 طلباتي</h2><div id="ordersList"></div></section>
+<section id="adminView" class="hidden"><h2>لوحة الإدارة التجريبية</h2><div class="notice">هذه لوحة محلية للتجربة فقط. لن تظهر طلبات الزبائن على جهازك إلا بعد ربط التطبيق بقاعدة بيانات مشتركة.</div><div id="adminOrders"></div></section>
+<div class="footer">ديليفري الأتارب • نسخة تجريبية</div>
+</main>
+<script>
+const stores=[
+{id:1,name:"مطعم الشام",type:"وجبات",emoji:"🍔",desc:"برغر ووجبات سريعة"},
+{id:2,name:"بيتزا الأتارب",type:"بيتزا",emoji:"🍕",desc:"بيتزا ومناقيش"},
+{id:3,name:"مطبخ البيت",type:"طبخ منزلي",emoji:"🍲",desc:"أكلات يومية"},
+{id:4,name:"سوبرماركت الخير",type:"متجر",emoji:"🛒",desc:"مواد غذائية"},
+{id:5,name:"حلويات السعادة",type:"حلويات",emoji:"🍰",desc:"حلويات وكاتو"},
+{id:6,name:"محمصة القهوة",type:"قهوة",emoji:"☕",desc:"قهوة ومشروبات"}
+];
+const products=[
+{id:1,store:1,name:"وجبة برغر",price:35000,emoji:"🍔"},{id:2,store:1,name:"بطاطا مقلية",price:12000,emoji:"🍟"},
+{id:3,store:2,name:"بيتزا خضار",price:40000,emoji:"🍕"},{id:4,store:2,name:"بيتزا جبنة",price:38000,emoji:"🧀"},
+{id:5,store:3,name:"وجبة رز ودجاج",price:45000,emoji:"🍗"},{id:6,store:3,name:"كبة",price:30000,emoji:"🥟"},
+{id:7,store:4,name:"مياه شرب",price:5000,emoji:"💧"},{id:8,store:4,name:"مواد غذائية متنوعة",price:15000,emoji:"🛍️"},
+{id:9,store:5,name:"قطعة كاتو",price:10000,emoji:"🍰"},{id:10,store:6,name:"قهوة",price:8000,emoji:"☕"}
+];
+let cart=JSON.parse(localStorage.getItem("ata_cart")||"[]");
+let orders=JSON.parse(localStorage.getItem("ata_orders")||"[]");
+const money=n=>Number(n).toLocaleString("en-US");
+const storeBy=id=>stores.find(s=>s.id===id);
+function renderStores(){document.getElementById("stores").innerHTML=stores.map(s=>`<article class="card"><div class="emoji">${s.emoji}</div><h3>${s.name}</h3><p>${s.desc}</p><span class="muted">${s.type}</span><div style="margin-top:10px"><button class="primary small" onclick="showProducts(${s.id})">عرض المنتجات</button></div></article>`).join("");renderProducts();}
+function renderProducts(filter=null){let arr=filter?products.filter(p=>p.store===filter):products;document.getElementById("products").innerHTML=arr.map(p=>`<article class="card"><div class="emoji">${p.emoji}</div><h3>${p.name}</h3><p>${storeBy(p.store).name}</p><div class="row"><span class="price">${money(p.price)} ل.س</span><button class="primary small" onclick="addCart(${p.id})">أضف +</button></div></article>`).join("")}
+function showProducts(id){renderProducts(id);document.getElementById("products").scrollIntoView({behavior:"smooth"});}
+function save(){localStorage.setItem("ata_cart",JSON.stringify(cart));localStorage.setItem("ata_orders",JSON.stringify(orders));updateCount();}
+function updateCount(){document.getElementById("cartCount").textContent=cart.reduce((a,i)=>a+i.qty,0)}
+function addCart(id){let it=cart.find(i=>i.id===id);it?it.qty++:cart.push({id,qty:1});save();renderCart();alert("انضاف المنتج للسلة");}
+function renderCart(){let el=document.getElementById("cartItems");if(!cart.length){el.innerHTML='<div class="empty">السلة فاضية حالياً</div>';document.getElementById("total").textContent="0";return}el.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return `<div class="item row"><div>${p.emoji} <b>${p.name}</b><div class="muted">${money(p.price)} ل.س للقطعة</div></div><div class="row"><button class="small" onclick="changeQty(${p.id},-1)">−</button><b>${i.qty}</b><button class="small" onclick="changeQty(${p.id},1)">+</button></div></div>`}).join("")+`<p><b>المجموع: ${money(cart.reduce((a,i)=>a+products.find(p=>p.id===i.id).price*i.qty,0))} ل.س</b></p><button onclick="cart=[];save();renderCart()" class="small">إفراغ السلة</button>`;document.getElementById("total").textContent=money(cart.reduce((a,i)=>a+products.find(p=>p.id===i.id).price*i.qty,0));}
+function changeQty(id,n){let it=cart.find(i=>i.id===id);if(!it)return;it.qty+=n;if(it.qty<=0)cart=cart.filter(i=>i.id!==id);save();renderCart();}
+function renderOrders(){let el=document.getElementById("ordersList");el.innerHTML=orders.length?orders.slice().reverse().map(o=>`<div class="panel"><div class="row"><b>طلب رقم #${o.id}</b><span class="muted">${o.status}</span></div><p>${o.name} — ${o.phone}</p><p>${o.address}</p><p>المجموع: <b>${money(o.total)} ل.س</b></p><p class="muted">${o.date}</p></div>`).join(""):'<div class="panel empty">ما عندك طلبات لسا</div>';document.getElementById("adminOrders").innerHTML=el.innerHTML;}
+document.getElementById("checkout").addEventListener("submit",e=>{e.preventDefault();if(!cart.length){alert("أضف منتجات للسلة أولاً");return}let f=new FormData(e.target);let total=cart.reduce((a,i)=>a+products.find(p=>p.id===i.id).price*i.qty,0);let o={id:Date.now().toString().slice(-6),name:f.get("name"),phone:f.get("phone"),address:f.get("address"),notes:f.get("notes"),total,status:"طلب جديد",date:new Date().toLocaleString("ar")};orders.push(o);cart=[];save();renderCart();renderOrders();e.target.reset();alert("تم حفظ الطلب التجريبي على هذا الجهاز فقط");showView("orders");});
+function showView(name){document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));document.getElementById(name+"View").classList.remove("hidden");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));if(name==="cart")renderCart();if(name==="orders"||name==="admin")renderOrders();window.scrollTo(0,0)}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+renderStores();renderCart();renderOrders();updateCount();
+</script>
+</body>
+</html>
