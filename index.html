@@ -67,8 +67,8 @@ async function loadCatalog(){
   products=pp.map(p=>({id:p.id,store:p.store_id,name:p.name,price:Number(p.price_syp),emoji:p.emoji}));
   renderStores();renderCart();
  }catch(err){
-  document.getElementById("stores").innerHTML='<div class="panel">ما قدرنا نحمّل المتاجر حالياً. تأكد من الإنترنت وحاول تحديث الصفحة.</div>';
-  console.error(err);
+  document.getElementById("stores").innerHTML='<div class="panel">ما قدرنا نحمّل المتاجر حالياً. تأكد من الإنترنت وحاول تحديث الصفحة.</div><button class="primary" onclick="loadCatalog()">إعادة المحاولة</button>';
+  console.error("Catalog load failed:",err);
  }
 }
 let cart=JSON.parse(localStorage.getItem("ata_cart")||"[]");
