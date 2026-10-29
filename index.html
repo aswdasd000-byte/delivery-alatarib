@@ -115,7 +115,37 @@ function notifyNewOrder(o){
  try{if(navigator.vibrate)navigator.vibrate([250,100,250]);}catch{}
 }
 function startOrderPolling(){if(orderPollTimer)clearInterval(orderPollTimer);orderPollTimer=setInterval(()=>{if(adminSession?.access_token)loadAdminOrders(false);},15000);}
-document.getElementById("enableNotifications").addEventListener("click",async()=>{const status=document.getElementById("notificationStatus");if(!("Notification" in window)){status.textContent="المتصفح ما بيدعم الإشعارات؛ خلي لوحة الإدارة مفتوحة للتنبيه.";return;}try{const permission=await Notification.requestPermission();notificationEnabled=permission==="granted";status.textContent=notificationEnabled?"تم تفعيل الإشعارات. خلي لوحة الإدارة مفتوحة.": "الإشعارات غير مسموحة؛ فعّلها من إعدادات المتصفح."; }catch{status.textContent="تعذر تفعيل الإشعارات من المتصفح.";}});
+function urlBase64ToUint8Array(base64String){
+ const padding="=".repeat((4-base64String.length%4)%4);
+ const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");
+ const raw=atob(base64);
+ return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));
+}
+document.getElementById("enableNotifications").addEventListener("click",async()=>{
+ const status=document.getElementById("notificationStatus");
+ const button=document.getElementById("enableNotifications");
+ button.disabled=true;
+ status.textContent="جارٍ تفعيل الإشعارات وحفظ اشتراك هذا الجهاز...";
+ try{
+  if(!adminSession?.access_token) throw new Error("سجّل الدخول إلى لوحة المدير أولاً.");
+  if(!("Notification" in window)||!("serviceWorker" in navigator)||!("PushManager" in window)) throw new Error("المتصفح لا يدعم إشعارات Push. جرّب Chrome على أندرويد.");
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted") throw new Error("الإشعارات غير مسموحة؛ فعّل إذن الإشعارات للموقع من إعدادات المتصفح.");
+  const healthRes=await fetch(SUPABASE_URL+"/functions/v1/push-health",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+adminSession.access_token}});
+  const health=await healthRes.json().catch(()=>({}));
+  if(!healthRes.ok) throw new Error(health.error||"تعذر فحص إعدادات الإشعارات. سجّل الدخول مجدداً وجرب.");
+  if(!health.vapid_public_key||!health.secrets_present?.VAPID_PUBLIC_KEY||!health.secrets_present?.VAPID_PRIVATE_KEY||!health.secrets_present?.VAPID_SUBJECT||!health.format_checks?.public_key_looks_valid) throw new Error("إعدادات Push على الخادم غير مكتملة أو المفتاح العام غير صالح؛ يلزم إكمال إعداد VAPID على الخادم.");
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(health.vapid_public_key)});
+  await adminApi("push_subscriptions?on_conflict=endpoint",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({endpoint:sub.endpoint,subscription:sub.toJSON(),audience:"admin"})});
+  notificationEnabled=true;
+  status.textContent="تم حفظ اشتراك الإشعارات لهذا الجهاز بنجاح. الإرسال التلقائي يحتاج ربط أحداث الطلبات بالخادم.";
+ }catch(err){
+  console.error("Push subscription failed:",err);
+  status.textContent=err?.message||"تعذر تفعيل الإشعارات؛ حاول مرة أخرى.";
+ }finally{button.disabled=false;}
+});
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 async function changeOrderStatus(id,status){try{await adminApi("orders?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({status})});alert("تم تحديث حالة الطلب.");}catch(err){alert("ما قدرنا نغيّر الحالة. تأكد من صلاحيات المدير.");console.error(err);await loadAdminOrders();}}
 document.getElementById("adminLogout").addEventListener("click",async()=>{try{if(adminSession?.access_token)await adminAuth("logout",{method:"POST",headers:{Authorization:"Bearer "+adminSession.access_token}});}catch{}adminSession=null;sessionStorage.removeItem("ata_admin_session");if(orderPollTimer)clearInterval(orderPollTimer);orderPollTimer=null;document.title="ديليفري الأتارب";document.getElementById("adminPanel").classList.add("hidden");document.getElementById("adminLogin").classList.remove("hidden");adminMessage("تم تسجيل الخروج.");});
