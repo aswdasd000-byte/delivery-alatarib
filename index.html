@@ -75,6 +75,12 @@ document.getElementById("checkout").addEventListener("submit",e=>{e.preventDefau
 function showView(name){document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));document.getElementById(name+"View").classList.remove("hidden");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));if(name==="cart")renderCart();if(name==="orders"||name==="admin")renderOrders();window.scrollTo(0,0)}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
 renderStores();renderCart();renderOrders();updateCount();
+</script> <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js");
+  });
+}
 </script>
 </body>
 </html>
