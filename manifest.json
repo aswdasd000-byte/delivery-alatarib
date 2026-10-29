@@ -1,0 +1,13 @@
+{
+"name": "ديليفري الأتارب",
+"short_name": "ديليفري الأتارب",
+"description": "تطبيق توصيل المطاعم والمتاجر في الأتارب",
+"lang": "ar",
+"dir": "rtl",
+"start_url": "./",
+"scope": "./",
+"display": "standalone",
+"background_color": "#ffffff",
+"theme_color": "#15803d",
+"icons": []
+}
