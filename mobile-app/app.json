@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "ديليفري الأتارب",
+    "slug": "delivery-alatarib",
+    "scheme": "deliveryalatarib",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.deliveryalatarib.app"
+    },
+    "android": {
+      "package": "com.deliveryalatarib.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#16834a"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
