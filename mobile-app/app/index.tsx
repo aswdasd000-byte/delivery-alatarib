@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from "react-native";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { supabase } from "../src/lib/supabase";
+import { Link } from "expo-router";
 
 type Store = { id: number; name: string; category: string | null; description: string | null; emoji: string | null };
 type Product = { id: number; store_id: number; name: string; description: string | null; price_syp: number; emoji: string | null; is_available: boolean };
@@ -60,7 +61,7 @@ export default function HomeScreen() {
  return <View style={styles.screen}><ExpoStatusBar style="light"/><StatusBar barStyle="light-content"/>
   <View style={styles.header}><Text style={styles.brand}>🍽️ ديليفري الأتارب</Text><Text style={styles.subtitle}>اطلب من متاجر منطقتك بسهولة</Text></View>
   <ScrollView contentContainerStyle={styles.content}>
-   <View style={styles.hero}><Text style={styles.heroTitle}>أهلاً فيك 👋</Text><Text style={styles.muted}>اختار المتجر، أضف طلبك، وحدد عنوان التوصيل.</Text></View>
+   <View style={styles.hero}><Text style={styles.heroTitle}>أهلاً فيك 👋</Text><Text style={styles.muted}>اختار المتجر، أضف طلبك، وحدد عنوان التوصيل.</Text></View>\n   <Link href="/driver" style={{color:"#16834a",fontWeight:"800",textAlign:"right",marginBottom:8}}>🛵 دخول واجهة المندوب</Link>
    {!!error && <Text style={styles.error}>{error}</Text>}
    <View style={styles.rowTitle}><Text style={styles.sectionTitle}>المتاجر</Text><Pressable onPress={load}><Text style={styles.link}>تحديث</Text></Pressable></View>
    {loading ? <ActivityIndicator size="large" color="#16834a" style={{margin:24}}/> : <FlatList horizontal data={[{id:-1,name:"الكل",category:"",description:"",emoji:"🛍️"} as Store,...stores]} keyExtractor={i=>String(i.id)} showsHorizontalScrollIndicator={false} contentContainerStyle={{gap:9,paddingVertical:8}} renderItem={({item})=><Pressable onPress={()=>setSelectedStore(item.id===-1?null:item.id)} style={[styles.storeChip, (selectedStore===item.id || (selectedStore===null&&item.id===-1))&&styles.storeChipActive]}><Text style={styles.storeEmoji}>{item.emoji||"🏪"}</Text><Text style={[styles.storeName,(selectedStore===item.id||(selectedStore===null&&item.id===-1))&&{color:"white"}]}>{item.name}</Text></Pressable>}/ >}
