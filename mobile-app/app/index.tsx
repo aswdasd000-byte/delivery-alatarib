@@ -14,6 +14,7 @@ export default function HomeScreen() {
  const [selectedStore, setSelectedStore] = useState<number | null>(null); const [cart, setCart] = useState<CartItem[]>([]);
  const [loading, setLoading] = useState(true); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
  const [name, setName] = useState(""); const [phone, setPhone] = useState(""); const [address, setAddress] = useState(""); const [notes, setNotes] = useState("");
+ const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [authBusy, setAuthBusy] = useState(false); const [userEmail, setUserEmail] = useState<string | null>(null); const [authMode, setAuthMode] = useState<"login"|"signup">("login");
  const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price_syp * item.quantity, 0), [cart]);
  async function load() {
   setLoading(true); setError("");
@@ -24,10 +25,26 @@ export default function HomeScreen() {
   if (s.error || p.error) setError("ما قدرنا نحمّل المتاجر والمنتجات. تأكد من اتصال قاعدة البيانات وصلاحياتها.");
   setStores((s.data ?? []) as Store[]); setProducts((p.data ?? []) as Product[]); setLoading(false);
  }
- useEffect(() => { load(); }, []);
+ useEffect(() => {
+  load();
+  supabase.auth.getSession().then(({data}) => setUserEmail(data.session?.user.email ?? null));
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUserEmail(session?.user.email ?? null));
+  return () => listener.subscription.unsubscribe();
+ }, []);
  const visibleProducts = products.filter(p => selectedStore === null || p.store_id === selectedStore);
  function add(p: Product) { setCart(old => { const found = old.find(i => i.id === p.id); return found ? old.map(i => i.id === p.id ? {...i, quantity:i.quantity+1} : i) : [...old, {...p, quantity:1}]; }); }
  function changeQty(id: number, delta: number) { setCart(old => old.map(i => i.id===id ? {...i,quantity:i.quantity+delta} : i).filter(i=>i.quantity>0)); }
+ async function handleAuth() {
+  if (!email.trim() || !password || password.length < 6) { Alert.alert("بيانات الدخول", "اكتب البريد الإلكتروني وكلمة مرور من 6 أحرف على الأقل."); return; }
+  setAuthBusy(true);
+  const result = authMode === "signup"
+    ? await supabase.auth.signUp({ email: email.trim(), password })
+    : await supabase.auth.signInWithPassword({ email: email.trim(), password });
+  setAuthBusy(false);
+  if (result.error) { Alert.alert("تعذر تسجيل الدخول", result.error.message); return; }
+  if (authMode === "signup" && !result.data.session) Alert.alert("تحقق من بريدك", "تم إنشاء الطلب؛ قد تحتاج لتأكيد البريد قبل تسجيل الدخول.");
+  else Alert.alert(authMode === "signup" ? "تم إنشاء الحساب" : "أهلاً بعودتك", "تمت معالجة طلب الدخول.");
+ }
  async function submitOrder() {
   if (!name.trim() || !phone.trim() || !address.trim()) { Alert.alert("بيانات ناقصة", "اكتب الاسم ورقم الهاتف وعنوان التوصيل."); return; }
   if (!cart.length) { Alert.alert("السلة فارغة", "أضف منتجات قبل إرسال الطلب."); return; }
@@ -47,6 +64,15 @@ export default function HomeScreen() {
    {!!error && <Text style={styles.error}>{error}</Text>}
    <View style={styles.rowTitle}><Text style={styles.sectionTitle}>المتاجر</Text><Pressable onPress={load}><Text style={styles.link}>تحديث</Text></Pressable></View>
    {loading ? <ActivityIndicator size="large" color="#16834a" style={{margin:24}}/> : <FlatList horizontal data={[{id:-1,name:"الكل",category:"",description:"",emoji:"🛍️"} as Store,...stores]} keyExtractor={i=>String(i.id)} showsHorizontalScrollIndicator={false} contentContainerStyle={{gap:9,paddingVertical:8}} renderItem={({item})=><Pressable onPress={()=>setSelectedStore(item.id===-1?null:item.id)} style={[styles.storeChip, (selectedStore===item.id || (selectedStore===null&&item.id===-1))&&styles.storeChipActive]}><Text style={styles.storeEmoji}>{item.emoji||"🏪"}</Text><Text style={[styles.storeName,(selectedStore===item.id||(selectedStore===null&&item.id===-1))&&{color:"white"}]}>{item.name}</Text></Pressable>}/ >}
+   <Text style={styles.sectionTitle}>حساب العميل</Text>
+   <View style={styles.panel}>
+    {userEmail ? <><Text style={styles.productName}>مسجل الدخول: {userEmail}</Text><Pressable style={[styles.addButton,{alignSelf:"flex-start",marginTop:10}]} onPress={async()=>{await supabase.auth.signOut();Alert.alert("تم تسجيل الخروج","تم إنهاء الجلسة.");}}><Text style={styles.addText}>تسجيل الخروج</Text></Pressable></> :
+    <><Text style={styles.muted}>سجّل دخولك أو أنشئ حساباً بالبريد الإلكتروني.</Text><View style={styles.rowTitle}><Pressable onPress={()=>setAuthMode("login")}><Text style={styles.link}>تسجيل الدخول</Text></Pressable><Pressable onPress={()=>setAuthMode("signup")}><Text style={styles.link}>إنشاء حساب</Text></Pressable></View>
+     <Text style={styles.label}>البريد الإلكتروني</Text><TextInput value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" style={styles.input} placeholder="name@example.com"/>
+     <Text style={styles.label}>كلمة المرور</Text><TextInput value={password} onChangeText={setPassword} secureTextEntry style={styles.input} placeholder="6 أحرف على الأقل"/>
+     <Pressable disabled={authBusy} style={[styles.submit,authBusy&&{opacity:.5}]} onPress={handleAuth}><Text style={styles.submitText}>{authBusy?"جارٍ المعالجة…":authMode==="signup"?"إنشاء الحساب":"تسجيل الدخول"}</Text></Pressable>
+    </>}
+   </View>
    <Text style={styles.sectionTitle}>المنتجات</Text>
    {!loading && visibleProducts.length===0 && <View style={styles.panel}><Text style={styles.muted}>ما في منتجات ظاهرة حالياً ضمن هذا الاختيار.</Text></View>}
    {visibleProducts.map(p=><View key={p.id} style={styles.product}><Text style={styles.productEmoji}>{p.emoji||"🍽️"}</Text><View style={{flex:1}}><Text style={styles.productName}>{p.name}</Text>{!!p.description&&<Text style={styles.muted}>{p.description}</Text>}<Text style={styles.price}>{money(Number(p.price_syp)||0)}</Text></View><Pressable style={styles.addButton} onPress={()=>add(p)}><Text style={styles.addText}>+ أضف</Text></Pressable></View>)}
