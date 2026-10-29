@@ -14,6 +14,7 @@ button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 14px
 nav button{background:#edf3ef;color:#234332;white-space:nowrap}nav button.active,.primary{background:var(--green);color:white}
 main{max-width:900px;margin:auto;padding:16px}.intro{background:#e8f5ec;border-radius:16px;padding:16px;margin-bottom:16px}.intro h2{margin:0 0 6px;font-size:19px}.muted{color:var(--muted);font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 6px #00004}.emoji{font-size:35px}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700}.small{padding:7px 10px;font-size:13px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #ccd7d0;border-radius:10px;margin:5px 0 12px;background:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#fff4d8;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#e6f7eb;padding:12px;border-radius:12px}.tabs-title{margin:5px 0 14px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+a{color:var(--green)}
 </style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#15803d">
 </head>
@@ -44,7 +45,7 @@ main{max-width:900px;margin:auto;padding:16px}.intro{background:#e8f5ec;border-r
 <section id="adminView" class="hidden"><h2>🔐 إدارة الطلبات</h2>
 <div id="adminLogin" class="panel"><p>سجّل دخولك بحساب المدير لمشاهدة الطلبات.</p><form id="adminLoginForm"><label>البريد الإلكتروني</label><input id="adminEmail" type="email" required value="aswdasd000@gmail.com" autocomplete="username"><label>كلمة المرور</label><input id="adminPassword" type="password" required autocomplete="current-password"><button class="primary" type="submit">تسجيل الدخول</button></form><p id="adminMessage" class="muted">لن تُرسل كلمة المرور إلى أي جهة غير Supabase.</p></div>
 <div id="adminPanel" class="hidden"><div class="row"><p id="adminWelcome"></p><button id="adminLogout" class="small">تسجيل الخروج</button></div><div class="row" style="flex-wrap:wrap;margin:10px 0"><button id="refreshOrders" class="primary small">تحديث الطلبات</button><button id="enableNotifications" class="small">🔔 تفعيل إشعارات الطلبات</button><span id="notificationStatus" class="muted">التنبيه يعمل أثناء بقاء لوحة الإدارة مفتوحة.</span></div><div id="adminOrders"></div></div></section>
-<div class="footer">ديليفري الأتارب • نسخة تجريبية</div>
+<div class="footer">ديليفري الأتارب • نسخة تجريبية<hr><p>لوحات العمل المنفصلة</p><p><a href="./admin.html">لوحة المدير</a> • <a href="./restaurant.html">لوحة المطعم</a> • <a href="./driver.html">لوحة سائق التوصيل</a></p></div>
 </main>
 <script>
 const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
