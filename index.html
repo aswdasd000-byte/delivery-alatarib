@@ -155,7 +155,7 @@ document.getElementById("enableNotifications").addEventListener("click",async()=
   const reg=await navigator.serviceWorker.ready;
   let sub=await reg.pushManager.getSubscription();
   if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(health.vapid_public_key)});
-  await adminApi("push_subscriptions?on_conflict=endpoint",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({endpoint:sub.endpoint,subscription:sub.toJSON(),audience:"admin"})});
+  await adminApi("push_subscriptions?on_conflict=endpoint,audience",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({endpoint:sub.endpoint,subscription:sub.toJSON(),audience:"admin"})});
   notificationEnabled=true;
   status.textContent="تم حفظ اشتراك الإشعارات لهذا الجهاز بنجاح. الإرسال التلقائي يحتاج ربط أحداث الطلبات بالخادم.";
  }catch(err){
