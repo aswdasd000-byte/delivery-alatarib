@@ -7,8 +7,11 @@
 "start_url": "./",
 "scope": "./",
 "display": "standalone",
-"background_color": "#ffffff",
-"theme_color": "#15803d",
+"orientation": "portrait",
+"prefer_related_applications": false,
+"categories": ["food", "shopping"],
+"background_color": "#171717",
+"theme_color": "#4165df",
 "icons": [
 {
 "src": "./icon-192.png",
