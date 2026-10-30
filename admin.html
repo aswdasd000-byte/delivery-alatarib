@@ -31,7 +31,7 @@ async function loadStoreManagement(){
  const stores=await api("stores?select=id,name,category,description,emoji,is_active&order=name");
  for(const id of ["productStore","accountStore"]){const sel=document.getElementById(id);const old=sel.value;sel.innerHTML=stores.filter(s=>s.is_active).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join("");if(old&&stores.some(s=>String(s.id)===old&&s.is_active))sel.value=old;}
  const list=document.getElementById("storeList");
- list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'نشط':'متوقف')+'</span></div><p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p><button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إيقاف المطعم':'إعادة تشغيل المطعم')+'</button><button type="button" class="danger" onclick="deleteStore('+Number(s.id)+')">🗑️ حذف نهائي</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
+ list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'● مفتوح':'● مغلق')+'</span></div><p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p><button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إغلاق المطعم':'فتح المطعم')+'</button><button type="button" class="danger" onclick="deleteStore('+Number(s.id)+')">🗑️ حذف نهائي</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
  await loadProductsForStore();
 }
 async function editStore(id){
@@ -70,9 +70,9 @@ async function deleteStore(id){
  }catch(e){alert("تعذر حذف المطعم: "+(e.message||"خطأ"));}
 }
 async function toggleStore(id,active){
- const msg=active?"إعادة تشغيل هذا المطعم وظهوره للزبائن؟":"إيقاف هذا المطعم وإخفاؤه عن الزبائن؟";
+ const msg=active?"فتح هذا المطعم واستقبال الطلبات من الزبائن؟":"إغلاق هذا المطعم وإيقاف استقبال الطلبات مؤقتاً؟";
  if(!confirm(msg))return;
- try{await api("stores?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({is_active:active})});await loadStoreManagement();document.getElementById("storeStatus").textContent=active?"تم تشغيل المطعم.":"تم إيقاف المطعم وإخفاؤه.";}
+ try{await api("stores?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({is_active:active})});await loadStoreManagement();document.getElementById("storeStatus").textContent=active?"تم فتح المطعم وأصبح ظاهراً للزبائن.":"تم إغلاق المطعم وسيظهر للزبائن بحالة مغلق.";}
  catch(e){alert("تعذر تحديث حالة المطعم: "+(e.message||"خطأ"));}
 }
 async function loadProductsForStore(){
