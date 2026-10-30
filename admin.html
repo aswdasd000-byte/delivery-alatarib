@@ -31,7 +31,7 @@ async function loadStoreManagement(){
  const stores=await api("stores?select=id,name,category,description,emoji,is_active&order=name");
  for(const id of ["productStore","accountStore"]){const sel=document.getElementById(id);const old=sel.value;sel.innerHTML=stores.filter(s=>s.is_active).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join("");if(old&&stores.some(s=>String(s.id)===old&&s.is_active))sel.value=old;}
  const list=document.getElementById("storeList");
- list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'نشط':'متوقف')+'</span></div><p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p><button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إيقاف المطعم':'إعادة تشغيل المطعم')+'</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
+ list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'نشط':'متوقف')+'</span></div><p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p><button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إيقاف المطعم':'إعادة تشغيل المطعم')+'</button><button type="button" class="danger" onclick="deleteStore('+Number(s.id)+')">🗑️ حذف نهائي</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
  await loadProductsForStore();
 }
 async function editStore(id){
@@ -46,6 +46,28 @@ async function editStore(id){
   document.getElementById("storeStatus").textContent="تم تعديل بيانات المطعم.";
   await loadStoreManagement();
  }catch(e){alert("تعذر تعديل المطعم: "+(e.message||"خطأ"));}
+}
+async function deleteStore(id){
+ try{
+  const rows=await api("stores?select=id,name&id=eq."+encodeURIComponent(id));
+  const st=rows[0];if(!st)throw Error("المطعم غير موجود.");
+  const products=await api("products?select=id&store_id=eq."+encodeURIComponent(id));
+  const productIds=products.map(p=>p.id);
+  if(productIds.length){
+   const refs=await api("order_items?select=id,product_id&product_id=in.("+productIds.join(",")+")");
+   if(refs.length){
+    alert("لا يمكن حذف «"+st.name+"» حالياً لأن له منتجات مرتبطة بطلبات سابقة ("+refs.length+" سجل). أوقف المطعم بدلاً من حذفه حتى لا نخسر سجل الطلبات.");
+    return;
+   }
+  }
+  if(!confirm("حذف المطعم «"+st.name+"» نهائياً؟ سيتم حذف منتجاته وروابط حسابات المطعم واشتراكاته بالإشعارات. لا يمكن التراجع عن ذلك."))return;
+  await api("store_staff?store_id=eq."+encodeURIComponent(id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+  await api("push_subscriptions?store_id=eq."+encodeURIComponent(id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+  if(productIds.length)await api("products?store_id=eq."+encodeURIComponent(id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+  await api("stores?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+  document.getElementById("storeStatus").textContent="تم حذف المطعم نهائياً.";
+  await loadStoreManagement();
+ }catch(e){alert("تعذر حذف المطعم: "+(e.message||"خطأ"));}
 }
 async function toggleStore(id,active){
  const msg=active?"إعادة تشغيل هذا المطعم وظهوره للزبائن؟":"إيقاف هذا المطعم وإخفاؤه عن الزبائن؟";
