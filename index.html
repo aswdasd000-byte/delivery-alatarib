@@ -15,12 +15,12 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 #products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#products .card{background:#252525;border:1px solid #363636;border-radius:17px;padding:10px;box-shadow:0 3px 10px #0003;min-width:0}#products .card h3{font-size:15px}#products .card p{color:#bdbdbd}#products .card img{height:125px!important}.emoji{font-size:35px}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700;color:#ffb34d}.small{padding:7px 10px;font-size:13px}
 .panel{background:#242424;border:1px solid #383838;border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #555;border-radius:10px;margin:5px 0 12px;background:#303030;color:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#59421d;color:#ffe2a6;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#174a2a;padding:12px;border-radius:12px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}a{color:#ff9b59}
 @media(min-width:650px){#stores{grid-template-columns:repeat(2,minmax(0,1fr))}#products{grid-template-columns:repeat(3,minmax(0,1fr))}}
-</style> <link rel="manifest" href="./manifest.json">
+.notification-panel{position:absolute;top:76px;left:12px;right:12px;z-index:30;max-height:65vh;overflow:auto;background:#242424;border:1px solid #555;border-radius:16px;padding:14px;box-shadow:0 8px 25px #0008}.notification-item{padding:12px 4px;border-bottom:1px solid #444}.notification-item:last-child{border:0}.notification-item b{display:block;margin-bottom:4px}.notification-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}</style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#4165df">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
 <body>
-<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><button type="button" id="customerBellBtn" aria-label="تفعيل إشعارات الطلبات" title="تفعيل إشعارات الطلبات" style="background:transparent;color:white;font-size:25px;padding:5px">🔔</button></div><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="width:100%;border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button>
+<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><button type="button" id="customerBellBtn" aria-label="تفعيل إشعارات الطلبات" title="تفعيل إشعارات الطلبات" style="background:transparent;color:white;font-size:25px;padding:5px">🔔</button><div id="customerNotificationsPanel" class="notification-panel hidden" aria-live="polite"><div class="row"><b>🔔 إشعاراتك</b><button type="button" id="closeCustomerNotifications" class="small">إغلاق ✕</button></div><div id="customerNotificationsList" class="muted" style="margin-top:10px">جارٍ تحميل الإشعارات...</div><div class="notification-actions"><button type="button" id="enableCustomerNotifications" class="primary small">تفعيل إشعارات الطلبات</button><button type="button" id="clearCustomerNotifications" class="small">مسح السجل</button></div></div><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="width:100%;border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button>
 <div id="homeLocationPanel" class="panel hidden" style="margin:10px 0 0;background:#242424;text-align:right">
  <button type="button" class="primary" id="useCurrentLocationBtn" style="width:100%;background:#4165df">🎯 استخدام موقعي الحالي</button>
  <p id="homeLocationStatus" class="muted" aria-live="polite">حدد موقعك ليسهل توصيل طلباتك.</p>
@@ -61,29 +61,17 @@ const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
 const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
 
 function urlBase64ToUint8Array(base64String){const padding="=".repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(base64);return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));}
-document.getElementById("customerBellBtn").addEventListener("click",async()=>{
- const bell=document.getElementById("customerBellBtn");
- if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window)){
-  alert("متصفحك لا يدعم إشعارات التطبيق. افتح الرابط بمتصفح Chrome أو ثبّت التطبيق أولاً.");return;
- }
- bell.disabled=true;
- try{
-  const permission=await Notification.requestPermission();
-  if(permission!=="granted"){
-   alert(permission==="denied"?"إشعارات التطبيق محظورة. فعّلها من إعدادات الموقع في المتصفح.":"لم يتم السماح بالإشعارات.");
-   return;
-  }
-  const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});
-  const keyData=await keyRes.json().catch(()=>({}));
-  if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر الاتصال بخدمة الإشعارات. حاول لاحقاً.");
-  const reg=await navigator.serviceWorker.register("./service-worker.js");
-  await navigator.serviceWorker.ready;
-  let sub=await reg.pushManager.getSubscription();
-  if(!sub)await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});
-  alert("✅ تم السماح بإشعارات ديليفري الأتارب على هذا الجهاز. وسيتم ربط إشعارات تحديث الطلب عند تسجيل طلبك.");
-  bell.textContent="🔔";
- }catch(err){console.error("Customer notification setup:",err);alert(err.message||"تعذر تفعيل الإشعارات.");}
- finally{bell.disabled=false;}
+const customerNotificationsPanel=document.getElementById("customerNotificationsPanel");
+const customerNotificationsList=document.getElementById("customerNotificationsList");
+function openCustomerNotifications(){customerNotificationsPanel.classList.remove("hidden");loadCustomerNotifications();}
+document.getElementById("customerBellBtn").addEventListener("click",()=>{customerNotificationsPanel.classList.toggle("hidden");if(!customerNotificationsPanel.classList.contains("hidden"))loadCustomerNotifications();});
+document.getElementById("closeCustomerNotifications").addEventListener("click",()=>customerNotificationsPanel.classList.add("hidden"));
+function openNotificationDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open("ata_customer_notifications",1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("items"))req.result.createObjectStore("items",{keyPath:"id",autoIncrement:true});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+async function loadCustomerNotifications(){try{const db=await openNotificationDB();const items=await new Promise((resolve,reject)=>{const tx=db.transaction("items","readonly"),req=tx.objectStore("items").getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);});db.close();items.sort((x,y)=>y.time-x.time);customerNotificationsList.innerHTML=items.length?items.map(n=>'<div class="notification-item"><b>'+escapeHtml(n.title||"ديليفري الأتارب")+'</b><div>'+escapeHtml(n.body||"عندك تحديث جديد")+'</div><small class="muted">'+new Date(n.time||Date.now()).toLocaleString("ar")+'</small></div>').join(""):'<div class="empty">ما عندك إشعارات لحد الآن. رح تظهر هون تحديثات طلباتك لما توصل.</div>';}catch(err){console.error(err);customerNotificationsList.textContent="تعذر تحميل سجل الإشعارات على هذا الجهاز.";}}
+document.getElementById("clearCustomerNotifications").addEventListener("click",async()=>{try{const db=await openNotificationDB();await new Promise((resolve,reject)=>{const tx=db.transaction("items","readwrite");tx.objectStore("items").clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();loadCustomerNotifications();}catch(err){alert("تعذر مسح سجل الإشعارات.");}});
+document.getElementById("enableCustomerNotifications").addEventListener("click",async()=>{
+ const btn=document.getElementById("enableCustomerNotifications");btn.disabled=true;
+ try{if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window))throw Error("متصفحك لا يدعم إشعارات التطبيق. افتح الرابط بمتصفح Chrome أو ثبّت التطبيق أولاً.");const permission=await Notification.requestPermission();if(permission!=="granted")throw Error(permission==="denied"?"إشعارات التطبيق محظورة. فعّلها من إعدادات الموقع في المتصفح.":"لم يتم السماح بالإشعارات.");const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});const keyData=await keyRes.json().catch(()=>({}));if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر الاتصال بخدمة الإشعارات. حاول لاحقاً.");await navigator.serviceWorker.register("./service-worker.js");const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});alert("✅ تم السماح بالإشعارات على هذا الجهاز. فعّلها لكل طلب عند إرساله حتى تصلك تحديثاته.");}catch(err){console.error("Customer notification setup:",err);alert(err.message||"تعذر تفعيل الإشعارات.");}finally{btn.disabled=false;}
 });
 async function enableOrderPush(orderNumber,phone){try{if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window))throw Error("المتصفح لا يدعم إشعارات الطلبات. جرّب Chrome على الهاتف.");const permission=await Notification.requestPermission();if(permission!=="granted")throw Error("ما وافقت على الإشعارات؛ طلبك ما زال مسجلاً.");const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});const keyData=await keyRes.json();if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر جلب إعدادات الإشعارات.");const reg=await navigator.serviceWorker.register("./service-worker.js");await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});const saved=await api("rpc/register_order_push",{method:"POST",body:JSON.stringify({p_order_number:Number(orderNumber),p_customer_phone:phone,p_endpoint:sub.endpoint,p_subscription:sub.toJSON()})});if(!saved?.success)throw Error(saved?.message||"تعذر ربط الإشعار بالطلب؛ تأكد من رقم الهاتف.");alert("✅ تم تفعيل إشعارات الطلب رقم "+orderNumber);}catch(err){console.error(err);alert("الطلب مسجّل، لكن ما قدرنا نفعّل إشعاراته: "+(err.message||"خطأ غير معروف"));}}
 
