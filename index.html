@@ -5,31 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ديليفري الأتارب</title>
 <style>
-:root{--green:#16834a;--bg:#f5f7f6;--ink:#17211b;--muted:#66736b;--card:#fff;--line:#e2e8e4}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-header{background:var(--green);color:white;padding:20px 16px 16px;position:sticky;top:0;z-index:2;box-shadow:0 2px 8px #0001}
-header h1{font-size:23px;margin:0 0 5px}header p{margin:0;font-size:13px;opacity:.9}
-nav{display:flex;gap:8px;padding:12px;overflow:auto;background:white;border-bottom:1px solid var(--line);position:sticky;top:83px;z-index:1}
-button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 14px}
-nav button{background:#edf3ef;color:#234332;white-space:nowrap}nav button.active,.primary{background:var(--green);color:white}
-main{max-width:900px;margin:auto;padding:16px}.intro{background:#e8f5ec;border-radius:16px;padding:16px;margin-bottom:16px}.intro h2{margin:0 0 6px;font-size:19px}.muted{color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 6px #00004}.emoji{font-size:35px}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700}.small{padding:7px 10px;font-size:13px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #ccd7d0;border-radius:10px;margin:5px 0 12px;background:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#fff4d8;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#e6f7eb;padding:12px;border-radius:12px}.tabs-title{margin:5px 0 14px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
-a{color:var(--green)}
+:root{--green:#ff7626;--bg:#171717;--ink:#f7f7f7;--muted:#bdbdbd;--card:#222;--line:#343434}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:92px}
+header{background:#4165df;color:#fff;padding:22px 18px 18px;position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #0003}.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.header-brand{min-width:0}header h1{font-size:22px;margin:0 0 5px;font-weight:800}header p{margin:0;font-size:13px;opacity:.9}.location-chip{margin-top:16px;background:#202020;color:#fff;border-radius:16px;padding:13px 16px;text-align:center;font-weight:700;font-size:17px}
+nav{display:flex;gap:4px;justify-content:space-around;align-items:center;padding:9px 5px calc(9px + env(safe-area-inset-bottom));background:#292929;border-top:1px solid #3b3b3b;position:fixed;bottom:0;left:0;right:0;z-index:20;overflow-x:auto}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 14px}nav button{background:transparent;color:#bdbdbd;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;min-width:65px;padding:7px 5px}nav button.active{background:transparent;color:#ff7626;box-shadow:inset 0 3px 0 #ff7626}nav button[data-view="stores"]::before{content:"⌂";font-size:25px;line-height:25px}nav button[data-view="cart"]::before{content:"🛵";font-size:21px;line-height:25px}nav button[data-view="orders"]::before{content:"▤";font-size:24px;line-height:25px}nav button[data-view="profile"]::before{content:"●";font-size:23px;line-height:25px}nav button span{background:#ff7626;color:white;border-radius:20px;padding:0 5px}.primary{background:var(--green);color:white}
+main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear-gradient(120deg,#4165df,#6486ed);border-radius:18px;padding:17px;margin-bottom:18px;color:#fff}.intro h2{margin:0 0 6px;font-size:19px}.intro .muted{color:#e6eaff}.muted{color:var(--muted);font-size:13px}.tabs-title{margin:18px 3px 13px;font-size:19px}
+#stores{display:grid;grid-template-columns:1fr;gap:18px}#stores .card{background:#222;border:0;border-radius:22px;padding:0 0 15px;overflow:hidden;box-shadow:none}#stores .emoji{height:150px;width:100%;display:flex;align-items:center;justify-content:center;font-size:76px;background:linear-gradient(135deg,#333,#555);border-radius:20px}#stores .card h3{font-size:21px;margin:13px 14px 4px}#stores .card p{margin:0 14px 8px;color:#c7c7c7}#stores .card .muted{display:block;margin:0 14px}#stores .card button{margin:12px 14px 0;background:#ff7626;color:#fff}
+#products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#products .card{background:#252525;border:1px solid #363636;border-radius:17px;padding:10px;box-shadow:0 3px 10px #0003;min-width:0}#products .card h3{font-size:15px}#products .card p{color:#bdbdbd}#products .card img{height:125px!important}.emoji{font-size:35px}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700;color:#ffb34d}.small{padding:7px 10px;font-size:13px}
+.panel{background:#242424;border:1px solid #383838;border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #555;border-radius:10px;margin:5px 0 12px;background:#303030;color:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#59421d;color:#ffe2a6;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#174a2a;padding:12px;border-radius:12px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}a{color:#ff9b59}
+@media(min-width:650px){#stores{grid-template-columns:repeat(2,minmax(0,1fr))}#products{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#15803d">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
 <body>
-<header><h1>🍽️ ديليفري الأتارب</h1><p>مطاعم ومتاجر منطقتك — اطلب بسهولة</p></header>
+<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><div class="location-chip">📍 موقعك الحالي　⌄</div></header>
 <nav>
-<button class="active" data-view="stores">🏠 الرئيسية</button>
-<button data-view="cart">🛵 توصيلتي <span id="cartCount">0</span></button>
-<button data-view="orders">📦 طلباتي</button>
-<button data-view="profile">👤 ملفي الشخصي</button>
+<button class="active" data-view="stores">الرئيسية</button>
+<button data-view="cart">توصيلتي <span id="cartCount">0</span></button>
+<button data-view="orders">طلباتي</button>
+<button data-view="profile">ملفي الشخصي</button>
 <button class="hidden" id="adminNav" data-view="admin">الإدارة</button>
 </nav>
 <main>
 <section id="storesView">
-<div class="intro"><h2>أهلاً فيك 👋</h2><div>اختار مطعمك أو متجرك، أضف المنتجات للسلة، وابعث طلبك.</div><p class="muted">الطلبات تُرسل إلى قاعدة البيانات المشتركة. الأسعار المعروضة حالياً تجريبية وتحتاج تأكيداً من أصحاب المتاجر.</p></div>
+<div class="intro"><h2>أهلاً فيك 👋</h2><div>اطلب من مطاعم ومتاجر الأتارب بسهولة، وكل خياراتك قدامك.</div><p class="muted">الأسعار المعروضة تجريبية وتحتاج تأكيداً من أصحاب المتاجر.</p></div>
 <h2 class="tabs-title">المطاعم والمتاجر</h2><div class="grid" id="stores"></div>
 <hr><h2 class="tabs-title">المنتجات</h2><div class="grid" id="products"></div>
 </section>
