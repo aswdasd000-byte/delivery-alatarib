@@ -41,13 +41,34 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <h2 class="tabs-title">المطاعم والمتاجر</h2><div class="store-filter-tabs" role="group" aria-label="تصنيف المتاجر"><button type="button" class="active" data-store-filter="all">الكل</button><button type="button" data-store-filter="restaurants">مطاعم</button><button type="button" data-store-filter="shops">متاجر</button><button type="button" data-store-filter="saved">السلال المحفوظة</button></div><div id="savedBasketsPanel" class="hidden"></div><div id="storeBrowseContent"><div class="grid" id="stores"></div>
 </div><div id="storeDetailView" class="hidden"><button type="button" class="small" onclick="closeStoreDetail()">← رجوع للمطاعم</button><h2 id="detailStoreName"></h2><div id="productCategoryTabs" class="store-filter-tabs"></div><div id="storeDetailProducts" class="grid"></div><div id="productDetailPage" class="panel hidden"></div><div id="storeCartBar" class="hidden" style="position:fixed;bottom:78px;left:12px;right:12px;z-index:15;background:#4165df;border-radius:14px;padding:10px 14px;box-shadow:0 4px 18px #0008"><div class="row"><span id="storeCartSummary">السلة</span><button class="primary small" onclick="showView('cart')" style="background:#ff7626">عرض السلة</button></div></div></div>
 </section>
-<section id="cartView" class="hidden"><h2>🛒 سلة المشتريات</h2><div class="panel" id="cartItems"></div><div class="panel"><h3>بيانات التوصيل</h3><form id="checkout">
-<label>الاسم الكامل</label><input name="name" required placeholder="اسمك">
-<label>رقم الهاتف</label><input name="phone" required inputmode="tel" placeholder="رقم للتواصل">
-<label>العنوان بالتفصيل</label><input name="address" required placeholder="الحي، الشارع، أقرب نقطة دالة"><div class="panel" style="padding:12px"><button type="button" class="primary" id="locateCustomerBtn">📍 تحديد موقعي على الخريطة</button><p id="locationStatus" class="muted">حدد موقع التسليم حتى يعرف السائق المكان بدقة. يمكنك تحريك العلامة لتعديل الموقع.</p><div id="customerMap" style="height:280px;border-radius:12px;display:none"></div></div>
-<label>ملاحظات (اختياري)</label><textarea name="notes" placeholder="أي تفاصيل إضافية"></textarea>
-<div class="row"><strong>المجموع: <span id="total">0</span> ل.س</strong><button class="primary" type="submit">إرسال الطلب</button></div>
-</form><div class="notice">أجرة التوصيل الحالية 200 ل.س وتُضاف تلقائياً إلى مجموع الطلب.</div></div></section>
+<section id="cartView" class="hidden">
+<style>
+#cartView .delivery-intro{background:#242424;border:1px solid #3b3b3b;border-radius:17px;padding:17px 15px;margin:10px 0 18px;line-height:1.9}
+#cartView .delivery-intro h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:#ff9a55}
+#cartView .delivery-intro p{margin:0;color:#e0e0e0;font-size:14px}
+#cartView .delivery-steps{display:flex;flex-direction:column;gap:12px;margin:18px 0 24px}
+#cartView .delivery-step{display:flex;align-items:center;gap:12px;background:#242424;border:1px solid #3b3b3b;border-radius:14px;padding:14px}
+#cartView .delivery-step .step-number{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;background:#ff7626;color:white;font-weight:800}
+#cartView .delivery-step b{font-size:15px}
+#cartView .delivery-arrow{text-align:center;color:#ff9a55;font-size:22px;line-height:12px}
+#cartView .add-delivery-box{position:sticky;bottom:82px;margin:20px 0 8px;padding:5px;background:#ff7626;border-radius:16px;box-shadow:0 5px 18px #0006}
+#cartView .add-delivery-box button{width:100%;background:#ff7626;color:#fff;font-size:17px;font-weight:800;padding:17px;border:1px solid #ff9a55;border-radius:13px}
+</style>
+<div class="delivery-intro">
+<h2>توصيلة خاصة إلك 🚚</h2>
+<p>ما لقيت طلبك ضمن المتاجر الخاصة بنا؟ لا تقلق، سنقوم بتوصيل أي شيء لك. فقط أعطنا معلومات طلبك لنلبّيه لك.</p>
+</div>
+<div class="delivery-steps" aria-label="خطوات إضافة توصيلة">
+<div class="delivery-step"><span class="step-number">1</span><b>حدد المتجر</b></div>
+<div class="delivery-arrow">↓</div>
+<div class="delivery-step"><span class="step-number">2</span><b>موقع التوصيل</b></div>
+<div class="delivery-arrow">↓</div>
+<div class="delivery-step"><span class="step-number">3</span><b>تفاصيل الطلب</b></div>
+</div>
+<div class="add-delivery-box"><button type="button" id="addDeliveryBtn">＋ إضافة توصيلة</button></div>
+<div id="cartItems" class="hidden"></div>
+<div class="hidden" aria-hidden="true"><form id="checkout"><input name="name"><input name="phone"><input name="address"><button type="submit">إرسال</button><textarea name="notes"></textarea></form><span id="total">0</span><button id="locateCustomerBtn" type="button"></button><p id="locationStatus"></p><div id="customerMap"></div></div>
+</section>
 <section id="ordersView" class="hidden"><h2>📦 طلباتي</h2><div id="ordersList"></div></section>
 <section id="profileView" class="hidden"><h2>👤 ملفي الشخصي</h2><div id="customerAuthPanel" class="panel"><p>سجّل حسابك لتحتفظ ببياناتك وتستخدم ملفك الشخصي.</p><form id="customerAuthForm"><label>الاسم الكامل</label><input id="customerName" required minlength="2" autocomplete="name" placeholder="اسمك الكامل"><label>البريد الإلكتروني</label><input id="customerEmail" type="email" required autocomplete="email" placeholder="name@example.com"><label>كلمة المرور</label><input id="customerPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="8 أحرف على الأقل"><label>رقم الهاتف</label><input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="رقم التواصل"><label>عنوان التوصيل</label><input id="customerAddress" autocomplete="street-address" placeholder="الحي والشارع وأقرب نقطة دالة"><button class="primary" type="submit" id="customerSignupBtn">إنشاء حساب</button> <button type="button" id="customerLoginBtn">عندي حساب — تسجيل الدخول</button><p class="muted" id="customerAuthMessage">كلمة المرور تُدار عبر نظام تسجيل الدخول الآمن.</p></form></div><div id="customerProfilePanel" class="panel hidden"><h3>👤 بياناتي الشخصية</h3><p class="muted">راجع بياناتك وعدّلها، ثم اضغط حفظ بياناتي.</p><label>الاسم الكامل</label><input id="profileFullName" autocomplete="name" placeholder="اسمك الكامل"><label>البريد الإلكتروني</label><input id="profileEmailInput" type="email" autocomplete="email" disabled><label>رقم الهاتف</label><input id="profilePhone" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل"><label>عنوان التوصيل</label><input id="profileAddress" autocomplete="street-address" placeholder="الحي والشارع وأقرب نقطة دالة"><div class="row" style="flex-wrap:wrap"><button class="primary" id="saveProfileBtn">حفظ بياناتي</button><button type="button" id="profileOrdersBtn">📦 طلباتي</button><button type="button" id="customerLogoutBtn">تسجيل الخروج</button></div><p id="profileMessage" class="muted" aria-live="polite"></p></div></section>
 <section id="adminView" class="hidden"><h2>🔐 إدارة الطلبات</h2>
