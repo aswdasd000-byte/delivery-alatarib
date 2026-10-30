@@ -68,7 +68,7 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <form id="customDeliveryForm" class="panel">
 <h3>بيانات التوصيلة</h3>
 <label for="customStore">المتجر أو المكان المطلوب الشراء منه</label>
-<select id="customStore" required><option value="">اختر المتجر</option><option value="مكان آخر">مكان آخر</option></select>
+<input id="customStore" list="customStoreOptions" required minlength="2" placeholder="اكتب اسم أي متجر أو اختر من الاقتراحات" autocomplete="off"><datalist id="customStoreOptions"></datalist><p class="muted">إذا ما لقيت المتجر بالقائمة، اكتب اسمه مباشرة.</p>
 <label for="customAddress">عنوان التوصيل بالتفصيل</label>
 <input id="customAddress" required minlength="5" placeholder="الحي، الشارع، البناء، أقرب نقطة دالة">
 <button type="button" id="customUseLocation" class="small">📍 استخدم موقعي الحالي</button><p id="customLocationStatus" class="muted">يمكنك كتابة العنوان أو تحديد موقعك الحالي.</p>
@@ -219,12 +219,12 @@ function renderOrders(){let el=document.getElementById("ordersList");el.innerHTM
 
 // Custom delivery request flow
 let customDeliveryLat=null,customDeliveryLng=null;
-function focusCustomStep(id){const el=document.getElementById(id);el?.scrollIntoView({behavior:"smooth",block:"center"});el?.focus();}
+function focusCustomStep(id){const el=document.getElementById(id);if(!el)return;el.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{el.focus({preventScroll:true});if(id==="customStore"){try{el.showPicker?.();}catch{}}},250);}
 document.querySelectorAll("#cartView [data-focus]").forEach(b=>b.addEventListener("click",()=>focusCustomStep(b.dataset.focus)));
 function refreshCustomStoreOptions(){
- const select=document.getElementById("customStore"),value=select.value;
- select.innerHTML='<option value="">اختر المتجر</option>'+stores.filter(s=>s.isOpen!==false).map(s=>'<option value="'+escapeHtml(s.name)+'">'+escapeHtml(s.name)+'</option>').join("")+'<option value="مكان آخر">مكان آخر</option>';
- if(value&&[...select.options].some(o=>o.value===value))select.value=value;
+ const list=document.getElementById("customStoreOptions");
+ if(!list)return;
+ list.innerHTML=stores.map(s=>'<option value="'+escapeHtml(s.name)+'"></option>').join("");
 }
 document.getElementById("customUseLocation").addEventListener("click",()=>{
  const status=document.getElementById("customLocationStatus");
