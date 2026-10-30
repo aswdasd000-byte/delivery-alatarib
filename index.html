@@ -8,6 +8,7 @@
 :root{--green:#ff7626;--bg:#171717;--ink:#f7f7f7;--muted:#bdbdbd;--card:#222;--line:#343434}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:92px}
 header{background:#4165df;color:#fff;padding:22px 18px 18px;position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #0003}.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.header-brand{min-width:0}header h1{font-size:22px;margin:0 0 5px;font-weight:800}header p{margin:0;font-size:13px;opacity:.9}.location-chip{margin-top:16px;background:#202020;color:#fff;border-radius:16px;padding:13px 16px;text-align:center;font-weight:700;font-size:17px}
+#homeLocationPanel input{margin:8px 0 12px}#homeLocationPanel button{font-weight:700}
 nav{display:flex;gap:4px;justify-content:space-around;align-items:center;padding:9px 5px calc(9px + env(safe-area-inset-bottom));background:#292929;border-top:1px solid #3b3b3b;position:fixed;bottom:0;left:0;right:0;z-index:20;overflow-x:auto}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 14px}nav button{background:transparent;color:#bdbdbd;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;min-width:65px;padding:7px 5px}nav button.active{background:transparent;color:#ff7626;box-shadow:inset 0 3px 0 #ff7626}nav button[data-view="stores"]::before{content:"⌂";font-size:25px;line-height:25px}nav button[data-view="cart"]::before{content:"🛵";font-size:21px;line-height:25px}nav button[data-view="orders"]::before{content:"▤";font-size:24px;line-height:25px}nav button[data-view="profile"]::before{content:"●";font-size:23px;line-height:25px}nav button span{background:#ff7626;color:white;border-radius:20px;padding:0 5px}.primary{background:var(--green);color:white}
 main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear-gradient(120deg,#4165df,#6486ed);border-radius:18px;padding:17px;margin-bottom:18px;color:#fff}.intro h2{margin:0 0 6px;font-size:19px}.intro .muted{color:#e6eaff}.muted{color:var(--muted);font-size:13px}.tabs-title{margin:18px 3px 13px;font-size:19px}
 #stores{display:grid;grid-template-columns:1fr;gap:18px}#stores .card{background:#222;border:0;border-radius:22px;padding:0 0 15px;overflow:hidden;box-shadow:none}#stores .emoji{height:150px;width:100%;display:flex;align-items:center;justify-content:center;font-size:76px;background:linear-gradient(135deg,#333,#555);border-radius:20px}#stores .card h3{font-size:21px;margin:13px 14px 4px}#stores .card p{margin:0 14px 8px;color:#c7c7c7}#stores .card .muted{display:block;margin:0 14px}#stores .card button{margin:12px 14px 0;background:#ff7626;color:#fff}
@@ -19,7 +20,14 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
 <body>
-<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><div class="location-chip">📍 موقعك الحالي　⌄</div>
+<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="width:100%;border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button>
+<div id="homeLocationPanel" class="panel hidden" style="margin:10px 0 0;background:#242424;text-align:right">
+ <button type="button" class="primary" id="useCurrentLocationBtn" style="width:100%;background:#4165df">🎯 استخدام موقعي الحالي</button>
+ <p id="homeLocationStatus" class="muted" aria-live="polite">حدد موقعك ليسهل توصيل طلباتك.</p>
+ <label for="homeDeliveryAddress">إضافة عنوان التوصيل</label>
+ <input id="homeDeliveryAddress" type="text" placeholder="الحي، الشارع، البناء، أقرب نقطة دالة" autocomplete="street-address">
+ <button type="button" id="saveHomeAddressBtn" class="primary" style="width:100%">حفظ العنوان</button>
+</div>
 <button id="installAppBtn" class="primary hidden" type="button" style="display:block;width:100%;margin-top:10px;background:#ff7626">⬇️ تثبيت تطبيق ديليفري الأتارب</button></header>
 <nav>
 <button class="active" data-view="stores">الرئيسية</button>
@@ -56,6 +64,56 @@ function urlBase64ToUint8Array(base64String){const padding="=".repeat((4-base64S
 async function enableOrderPush(orderNumber,phone){try{if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window))throw Error("المتصفح لا يدعم إشعارات الطلبات. جرّب Chrome على الهاتف.");const permission=await Notification.requestPermission();if(permission!=="granted")throw Error("ما وافقت على الإشعارات؛ طلبك ما زال مسجلاً.");const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});const keyData=await keyRes.json();if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر جلب إعدادات الإشعارات.");const reg=await navigator.serviceWorker.register("./service-worker.js");await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});const saved=await api("rpc/register_order_push",{method:"POST",body:JSON.stringify({p_order_number:Number(orderNumber),p_customer_phone:phone,p_endpoint:sub.endpoint,p_subscription:sub.toJSON()})});if(!saved?.success)throw Error(saved?.message||"تعذر ربط الإشعار بالطلب؛ تأكد من رقم الهاتف.");alert("✅ تم تفعيل إشعارات الطلب رقم "+orderNumber);}catch(err){console.error(err);alert("الطلب مسجّل، لكن ما قدرنا نفعّل إشعاراته: "+(err.message||"خطأ غير معروف"));}}
 
 let customerLat=null,customerLng=null,customerMap=null,customerMarker=null;
+let homeLat=null,homeLng=null;
+const homeAddressKey="ata_customer_delivery_address";
+const homeLocationKey="ata_customer_location";
+const homeToggle=document.getElementById("homeLocationToggle");
+const homePanel=document.getElementById("homeLocationPanel");
+const homeStatus=document.getElementById("homeLocationStatus");
+const homeAddressInput=document.getElementById("homeDeliveryAddress");
+function loadHomeDeliveryDetails(){
+ const savedAddress=localStorage.getItem(homeAddressKey)||"";
+ homeAddressInput.value=savedAddress;
+ const savedLocation=JSON.parse(localStorage.getItem(homeLocationKey)||"null");
+ if(savedLocation&&Number.isFinite(Number(savedLocation.lat))&&Number.isFinite(Number(savedLocation.lng))){
+  homeLat=Number(savedLocation.lat);homeLng=Number(savedLocation.lng);
+  homeStatus.textContent="تم حفظ موقعك الحالي على هذا الجهاز.";
+ }
+ if(savedAddress)document.getElementById("homeLocationLabel").textContent=savedAddress;
+}
+homeToggle.addEventListener("click",()=>{
+ const opening=homePanel.classList.contains("hidden");
+ homePanel.classList.toggle("hidden");
+ homeToggle.setAttribute("aria-expanded",String(opening));
+});
+document.getElementById("useCurrentLocationBtn").addEventListener("click",()=>{
+ if(!navigator.geolocation){homeStatus.textContent="جهازك أو المتصفح لا يدعم تحديد الموقع.";return;}
+ homeStatus.textContent="جارٍ تحديد موقعك... اسمح للمتصفح بالوصول للموقع إذا طلب ذلك.";
+ const btn=document.getElementById("useCurrentLocationBtn");btn.disabled=true;
+ navigator.geolocation.getCurrentPosition(pos=>{
+  homeLat=pos.coords.latitude;homeLng=pos.coords.longitude;
+  localStorage.setItem(homeLocationKey,JSON.stringify({lat:homeLat,lng:homeLng,accuracy:pos.coords.accuracy}));
+  homeStatus.textContent="✅ تم تحديد موقعك الحالي بنجاح. دقة الموقع تقريباً "+Math.round(pos.coords.accuracy)+" متر.";
+  customerLat=homeLat;customerLng=homeLng;
+  btn.disabled=false;
+ },err=>{
+  homeStatus.textContent=err.code===1?"رفضت إذن الموقع. فعّل صلاحية الموقع للمتصفح وحاول مجدداً.":err.code===2?"تعذر معرفة موقعك. فعّل GPS وتأكد من الإنترنت.":"استغرق تحديد الموقع وقتاً طويلاً. حاول مرة ثانية.";
+  btn.disabled=false;
+ },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+});
+document.getElementById("saveHomeAddressBtn").addEventListener("click",()=>{
+ const address=homeAddressInput.value.trim();
+ if(!address){homeStatus.textContent="اكتب عنوان التوصيل أولاً ثم اضغط حفظ العنوان.";homeAddressInput.focus();return;}
+ localStorage.setItem(homeAddressKey,address);
+ document.getElementById("homeLocationLabel").textContent=address;
+ const checkoutAddress=document.querySelector('#checkout input[name="address"]');
+ if(checkoutAddress)checkoutAddress.value=address;
+ const profileAddress=document.getElementById("profileAddress");
+ if(profileAddress&&!profileAddress.value)profileAddress.value=address;
+ homeStatus.textContent="✅ تم حفظ عنوان التوصيل على هذا الجهاز.";
+});
+loadHomeDeliveryDetails();
+
 function setCustomerLocation(lat,lng){
  customerLat=Number(lat);customerLng=Number(lng);
  if(!customerMap){document.getElementById("customerMap").style.display="block";customerMap=L.map("customerMap").setView([customerLat,customerLng],16);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(customerMap);customerMarker=L.marker([customerLat,customerLng],{draggable:true}).addTo(customerMap);customerMarker.on("dragend",()=>{const p=customerMarker.getLatLng();customerLat=p.lat;customerLng=p.lng;document.getElementById("locationStatus").textContent="تم تحديد الموقع: "+customerLat.toFixed(6)+", "+customerLng.toFixed(6);});}
