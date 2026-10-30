@@ -49,7 +49,7 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 #cartView .delivery-steps{display:flex;flex-direction:column;gap:12px;margin:18px 0 24px}
 #cartView .delivery-step{display:flex;align-items:center;gap:12px;background:#242424;border:1px solid #3b3b3b;border-radius:14px;padding:14px}
 #cartView .delivery-step .step-number{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;background:#ff7626;color:white;font-weight:800}
-#cartView .delivery-step b{font-size:15px}
+#cartView .delivery-step b{font-size:15px}#cartView .delivery-step{width:100%;text-align:right;color:#fff;cursor:pointer;flex-wrap:wrap}#cartView .delivery-step:focus{outline:2px solid #ff7626}#cartView .step-hint{width:100%;padding-right:46px;color:#bdbdbd;font-size:12px}#customDeliveryForm{margin-top:10px}#customDeliveryForm button{background:#353535;color:#fff}
 #cartView .delivery-arrow{text-align:center;color:#ff9a55;font-size:22px;line-height:12px}
 #cartView .add-delivery-box{position:sticky;bottom:82px;margin:20px 0 8px;padding:5px;background:#ff7626;border-radius:16px;box-shadow:0 5px 18px #0006}
 #cartView .add-delivery-box button{width:100%;background:#ff7626;color:#fff;font-size:17px;font-weight:800;padding:17px;border:1px solid #ff9a55;border-radius:13px}
@@ -59,13 +59,25 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <p>ما لقيت طلبك ضمن المتاجر الخاصة بنا؟ لا تقلق، سنقوم بتوصيل أي شيء لك. فقط أعطنا معلومات طلبك لنلبّيه لك.</p>
 </div>
 <div class="delivery-steps" aria-label="خطوات إضافة توصيلة">
-<div class="delivery-step"><span class="step-number">1</span><b>حدد المتجر</b></div>
+<button type="button" class="delivery-step" data-focus="customStore"><span class="step-number">1</span><b>حدد المتجر</b><span class="step-hint" id="customStoreHint">اضغط لاختيار المتجر</span></button>
 <div class="delivery-arrow">↓</div>
-<div class="delivery-step"><span class="step-number">2</span><b>موقع التوصيل</b></div>
+<button type="button" class="delivery-step" data-focus="customAddress"><span class="step-number">2</span><b>موقع التوصيل</b><span class="step-hint" id="customAddressHint">اضغط لإدخال عنوانك</span></button>
 <div class="delivery-arrow">↓</div>
-<div class="delivery-step"><span class="step-number">3</span><b>تفاصيل الطلب</b></div>
+<button type="button" class="delivery-step" data-focus="customDetails"><span class="step-number">3</span><b>تفاصيل الطلب</b><span class="step-hint" id="customDetailsHint">اضغط لكتابة طلبك</span></button>
 </div>
-<div class="add-delivery-box"><button type="button" id="addDeliveryBtn">＋ إضافة توصيلة</button></div>
+<form id="customDeliveryForm" class="panel">
+<h3>بيانات التوصيلة</h3>
+<label for="customStore">المتجر أو المكان المطلوب الشراء منه</label>
+<select id="customStore" required><option value="">اختر المتجر</option><option value="مكان آخر">مكان آخر</option></select>
+<label for="customAddress">عنوان التوصيل بالتفصيل</label>
+<input id="customAddress" required minlength="5" placeholder="الحي، الشارع، البناء، أقرب نقطة دالة">
+<button type="button" id="customUseLocation" class="small">📍 استخدم موقعي الحالي</button><p id="customLocationStatus" class="muted">يمكنك كتابة العنوان أو تحديد موقعك الحالي.</p>
+<label for="customDetails">تفاصيل الطلب</label>
+<textarea id="customDetails" required minlength="3" placeholder="اكتب شو بدك نشتريلك أو نوصلّك..."></textarea>
+<label for="customName">اسمك</label><input id="customName" required minlength="2" placeholder="الاسم الكامل">
+<label for="customPhone">رقم الهاتف</label><input id="customPhone" required minlength="5" inputmode="tel" placeholder="رقم للتواصل">
+</form>
+<div class="add-delivery-box"><button type="submit" form="customDeliveryForm" id="addDeliveryBtn">＋ إضافة توصيلة وإرسال الطلب</button></div>
 <div id="cartItems" class="hidden"></div>
 <div class="hidden" aria-hidden="true"><form id="checkout"><input name="name"><input name="phone"><input name="address"><button type="submit">إرسال</button><textarea name="notes"></textarea></form><span id="total">0</span><button id="locateCustomerBtn" type="button"></button><p id="locationStatus"></p><div id="customerMap"></div></div>
 </section>
@@ -171,7 +183,7 @@ async function loadCatalog(){
   const [ss,pp]=await Promise.all([api("stores?select=id,name,category,description,emoji,is_active&order=id"),api("products?select=id,store_id,name,description,category,price_syp,emoji,image_url&is_available=eq.true&order=id")]);
   stores=ss.map(s=>({id:s.id,name:s.name,type:s.category,desc:s.description,emoji:s.emoji,isOpen:s.is_active!==false}));
   products=pp.map(p=>({id:p.id,store:p.store_id,name:p.name,desc:p.description||"",category:p.category||"عام",price:Number(p.price_syp),emoji:p.emoji,image_url:p.image_url||""}));
-  renderStores();renderCart();updateStoreCartBar();
+  renderStores();renderCart();updateStoreCartBar();refreshCustomStoreOptions();
  }catch(err){
   document.getElementById("stores").innerHTML='<div class="panel">ما قدرنا نحمّل المتاجر حالياً. تأكد من الإنترنت وحاول تحديث الصفحة.</div>';
   console.error(err);
@@ -204,6 +216,43 @@ function addCart(id){const p=products.find(x=>x.id===id);if(!p||!prepareCartForP
 function renderCart(){let el=document.getElementById("cartItems");if(!cart.length){el.innerHTML='<div class="empty">السلة الحالية فاضية. إذا عندك سلال محفوظة لمطاعم ثانية افتح «السلال المحفوظة» من الرئيسية.</div>';document.getElementById("total").textContent="0";return}const subtotal=cartSubtotal();const activeSid=basketStoreId(cart);const activeStore=activeSid?storeBy(Number(activeSid)):null;el.innerHTML='<div class="notice">طلبك من: <b>'+escapeHtml(activeStore?.name||"مطعم واحد")+'</b>. لا يمكن إضافة منتجات من مطعم آخر إلى هذه السلة.</div><button type="button" class="small" onclick="saveCurrentBasket()">💾 حفظ السلة</button>'+cart.map(i=>{let p=products.find(p=>p.id===i.id);if(!p)return "";return `<div class="item row"><div>${p.image_url?`<img src="${p.image_url}" alt="${p.name}" style="width:54px;height:54px;object-fit:cover;border-radius:10px;vertical-align:middle;margin-left:8px">`:p.emoji} <b>${p.name}</b><div class="muted">${money(p.price)} ل.س للقطعة</div>${i.note?`<div class="muted">ملاحظة: ${escapeHtml(i.note)}</div>`:""}</div><div class="row"><button class="small" onclick="changeQty(${p.id},-1)">−</button><b>${i.qty}</b><button class="small" onclick="changeQty(${p.id},1)">+</button></div></div>`}).join("")+`<p>مجموع المنتجات: <b>${money(subtotal)} ل.س</b></p><p>أجرة التوصيل: <b>${money(DELIVERY_FEE_SYP)} ل.س</b></p><p><b>المجموع النهائي: ${money(subtotal+DELIVERY_FEE_SYP)} ل.س</b></p><button onclick="cart=[];save();renderCart()" class="small">إفراغ السلة</button>`;document.getElementById("total").textContent=money(subtotal+DELIVERY_FEE_SYP);}
 function saveCurrentBasket(){if(!cart.length){alert("السلة فاضية؛ أضف منتجات أولاً.");return;}const name=prompt("سمّي هالسلة حتى تلاقيها بسهولة:","سلتي "+(savedBaskets.length+1));if(name===null)return;if(!name.trim()){alert("اكتب اسم للسلة.");return;}const sid=basketStoreId(cart);if(!sid){alert("لا يمكن حفظ سلة تضم منتجات من مطاعم مختلفة.");return;}savedBaskets.push({name:name.trim(),store_id:Number(sid),date:new Date().toISOString(),items:cart.map(i=>({...i}))});persistSavedBaskets();alert("تم حفظ السلة بنجاح.");}function changeQty(id,n){let it=cart.find(i=>i.id===id);if(!it)return;it.qty+=n;if(it.qty<=0)cart=cart.filter(i=>i.id!==id);save();renderCart();updateStoreCartBar();}
 function renderOrders(){let el=document.getElementById("ordersList");el.innerHTML=orders.length?orders.slice().reverse().map(o=>`<div class="panel"><div class="row"><b>طلب رقم #${o.id}</b><span class="muted">${o.status}</span></div><p>${o.name} — ${o.phone}</p><p>${o.address}</p><p>المجموع: <b>${money(o.total)} ل.س</b></p><p class="muted">${o.date}</p></div>`).join(""):'<div class="panel empty">ما عندك طلبات محفوظة على هالجهاز لسا</div>';}
+
+// Custom delivery request flow
+let customDeliveryLat=null,customDeliveryLng=null;
+function focusCustomStep(id){const el=document.getElementById(id);el?.scrollIntoView({behavior:"smooth",block:"center"});el?.focus();}
+document.querySelectorAll("#cartView [data-focus]").forEach(b=>b.addEventListener("click",()=>focusCustomStep(b.dataset.focus)));
+function refreshCustomStoreOptions(){
+ const select=document.getElementById("customStore"),value=select.value;
+ select.innerHTML='<option value="">اختر المتجر</option>'+stores.filter(s=>s.isOpen!==false).map(s=>'<option value="'+escapeHtml(s.name)+'">'+escapeHtml(s.name)+'</option>').join("")+'<option value="مكان آخر">مكان آخر</option>';
+ if(value&&[...select.options].some(o=>o.value===value))select.value=value;
+}
+document.getElementById("customUseLocation").addEventListener("click",()=>{
+ const status=document.getElementById("customLocationStatus");
+ if(!navigator.geolocation){status.textContent="المتصفح لا يدعم تحديد الموقع.";return;}
+ status.textContent="جارٍ تحديد موقعك...";
+ navigator.geolocation.getCurrentPosition(pos=>{
+ customDeliveryLat=pos.coords.latitude;customDeliveryLng=pos.coords.longitude;
+ status.textContent="✅ تم تحديد موقعك بنجاح.";
+ },()=>{status.textContent="ما قدرنا نحدد موقعك. اكتب العنوان يدوياً.";},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+});
+document.getElementById("customDeliveryForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const form=e.currentTarget,btn=document.getElementById("addDeliveryBtn");
+ const store=document.getElementById("customStore").value.trim(),address=document.getElementById("customAddress").value.trim(),details=document.getElementById("customDetails").value.trim(),name=document.getElementById("customName").value.trim(),phone=document.getElementById("customPhone").value.trim();
+ if(!store||address.length<5||details.length<3||name.length<2||phone.length<5){alert("تأكد من تعبئة كل معلومات التوصيلة.");return;}
+ btn.disabled=true;btn.textContent="جارٍ إرسال التوصيلة...";
+ try{
+ const result=await api("rpc/submit_custom_delivery_request",{method:"POST",body:JSON.stringify({p_customer_name:name,p_customer_phone:phone,p_delivery_address:address,p_store_name:store,p_request_details:details,p_map_location:customDeliveryLat!==null?customDeliveryLat.toFixed(6)+","+customDeliveryLng.toFixed(6):""})});
+ if(!result?.success||!result?.order_number)throw new Error("ما وصل تأكيد استلام التوصيلة.");
+ orders.push({id:result.order_number,name,phone,address,total:200,status:"جديد",date:new Date().toLocaleString("ar")});
+ localStorage.setItem("ata_orders",JSON.stringify(orders));renderOrders();form.reset();customDeliveryLat=null;customDeliveryLng=null;
+ document.getElementById("customLocationStatus").textContent="يمكنك كتابة العنوان أو تحديد موقعك الحالي.";
+ document.getElementById("customStoreHint").textContent="اضغط لاختيار المتجر";document.getElementById("customAddressHint").textContent="اضغط لإدخال عنوانك";document.getElementById("customDetailsHint").textContent="اضغط لكتابة طلبك";
+ alert("✅ تم إرسال التوصيلة بنجاح. رقم الطلب: "+result.order_number);showView("orders");
+ }catch(err){console.error(err);alert(err.message||"تعذر إرسال التوصيلة. حاول مرة ثانية.");}
+ finally{btn.disabled=false;btn.textContent="＋ إضافة توصيلة وإرسال الطلب";}
+});
+
 document.getElementById("checkout").addEventListener("submit",async e=>{e.preventDefault();if(!cart.length){alert("أضف منتجات للسلة أولاً");return}if(!basketStoreId(cart)){alert("لا يمكن إرسال طلب يحتوي منتجات من أكثر من مطعم. افصل السلال أولاً.");return}const form=e.target;const btn=form.querySelector('button[type="submit"]');const fd=new FormData(form);const customer={name:String(fd.get("name")||"").trim(),phone:String(fd.get("phone")||"").trim(),address:String(fd.get("address")||"").trim(),notes:String(fd.get("notes")||"").trim()};if(customerLat===null||customerLng===null){alert("حدد موقع التسليم على الخريطة أولاً حتى يقدر السائق يوصل لعندك.");document.getElementById("locateCustomerBtn").focus();return;}customer.address=customer.address+" [MAP:"+customerLat.toFixed(6)+","+customerLng.toFixed(6)+"]";if(customer.name.length<2){alert("اكتب اسمك بشكل صحيح (حرفين على الأقل).");form.elements.name.focus();return}if(customer.phone.length<5){alert("اكتب رقم هاتف صحيح (5 أرقام/رموز على الأقل).");form.elements.phone.focus();return}if(customer.address.length<5){alert("اكتب العنوان بالتفصيل (5 أحرف على الأقل).");form.elements.address.focus();return}const invalidCart=cart.some(i=>!products.some(p=>p.id===i.id)||!Number.isInteger(Number(i.qty))||i.qty<1||i.qty>50);if(invalidCart){cart=cart.filter(i=>products.some(p=>p.id===i.id)&&Number.isInteger(Number(i.qty))&&i.qty>=1&&i.qty<=50);save();renderCart();alert("حدّثنا السلة لأن بعض المنتجات لم تعد متاحة. راجعها وحاول مجدداً.");return}btn.disabled=true;btn.textContent="عم نرسل الطلب...";try{const items=cart.map(i=>({product_id:Number(i.id),quantity:Number(i.qty)}));const result=await api("rpc/submit_delivery_order",{method:"POST",body:JSON.stringify({p_customer_name:customer.name,p_customer_phone:customer.phone,p_delivery_address:customer.address+(customerLat!==null&&customerLng!==null?" [MAP:"+customerLat+","+customerLng+"]":""),p_notes:[customer.notes,...cart.filter(i=>i.note).map(i=>{const p=products.find(x=>x.id===i.id);return (p?.name||"الصنف")+": "+i.note;})].filter(Boolean).join("\n"),p_items:items})});if(!result?.success||!result?.order_number)throw new Error("وصل رد غير متوقع من النظام. لا تعيد الطلب قبل التأكد من قائمة طلباتي.");const total=cartSubtotal()+DELIVERY_FEE_SYP;orders.push({id:result.order_number,name:customer.name,phone:customer.phone,address:customer.address,total,status:"جديد",date:new Date().toLocaleString("ar")});cart=[];save();renderCart();renderOrders();form.reset();alert("تم استلام طلبك بنجاح. رقم الطلب: "+result.order_number);showView("orders");if(confirm("بدك تفعّل إشعارات تحديثات هالطلب؟ رح نرسل لك حالة الطلب والعروض إذا وافقت.")){enableOrderPush(result.order_number,customer.phone);}}catch(err){console.error("فشل إرسال الطلب:",err);let message=err.message||"خطأ غير معروف";try{const parsed=JSON.parse(message);message=parsed.message||parsed.details||message;}catch{}alert("ما قدرنا نرسل الطلب: "+message);}finally{btn.disabled=false;btn.textContent="إرسال الطلب";}});
 
 let customerSession=null;
