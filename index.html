@@ -15,10 +15,12 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 .panel{background:#242424;border:1px solid #383838;border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #555;border-radius:10px;margin:5px 0 12px;background:#303030;color:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#59421d;color:#ffe2a6;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#174a2a;padding:12px;border-radius:12px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}a{color:#ff9b59}
 @media(min-width:650px){#stores{grid-template-columns:repeat(2,minmax(0,1fr))}#products{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style> <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#15803d">
+<meta name="theme-color" content="#4165df">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
 <body>
-<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><div class="location-chip">📍 موقعك الحالي　⌄</div></header>
+<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><div class="location-chip">📍 موقعك الحالي　⌄</div>
+<button id="installAppBtn" class="primary hidden" type="button" style="display:block;width:100%;margin-top:10px;background:#ff7626">⬇️ تثبيت تطبيق ديليفري الأتارب</button></header>
 <nav>
 <button class="active" data-view="stores">الرئيسية</button>
 <button data-view="cart">توصيلتي <span id="cartCount">0</span></button>
@@ -174,6 +176,28 @@ if(new URLSearchParams(location.search).get("admin")==="1"){document.getElementB
 restoreCustomerSession();
 renderOrders();updateCount();loadCatalog();
 </script> <script>
+let deferredInstallPrompt=null;
+const installAppBtn=document.getElementById("installAppBtn");
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault();
+ deferredInstallPrompt=event;
+ if(installAppBtn) installAppBtn.classList.remove("hidden");
+});
+if(installAppBtn) installAppBtn.addEventListener("click",async()=>{
+ if(!deferredInstallPrompt){
+  alert("لتثبيت التطبيق: افتح قائمة المتصفح ⋮ ثم اختر تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية.");
+  return;
+ }
+ deferredInstallPrompt.prompt();
+ const choice=await deferredInstallPrompt.userChoice;
+ if(choice?.outcome==="accepted") installAppBtn.classList.add("hidden");
+ deferredInstallPrompt=null;
+});
+window.addEventListener("appinstalled",()=>{
+ if(installAppBtn) installAppBtn.classList.add("hidden");
+});
+</script>
+<script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./service-worker.js");
