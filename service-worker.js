@@ -14,7 +14,15 @@ self.addEventListener("push", (event) => {
     tag: data.tag || "delivery-update",
     renotify: true
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil((async()=>{
+    await self.registration.showNotification(title, options);
+    await new Promise((resolve,reject)=>{
+      const req=indexedDB.open("ata_customer_notifications",1);
+      req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("items"))req.result.createObjectStore("items",{keyPath:"id",autoIncrement:true});};
+      req.onsuccess=()=>{const db=req.result;const tx=db.transaction("items","readwrite");tx.objectStore("items").add({title,body:options.body,time:Date.now(),orderNumber:data.orderNumber||null});tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>{db.close();reject(tx.error);};};
+      req.onerror=()=>reject(req.error);
+    });
+  })());
 });
 
 self.addEventListener("notificationclick", (event) => {
