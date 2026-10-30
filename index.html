@@ -20,7 +20,7 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
 <body>
-<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><span style="font-size:25px" aria-hidden="true">🔔</span></div><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="width:100%;border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button>
+<header><div class="header-top"><div class="header-brand"><h1>ديليفري الأتارب</h1><p>كل طلباتك من منطقتك بمكان واحد</p></div><button type="button" id="customerBellBtn" aria-label="تفعيل إشعارات الطلبات" title="تفعيل إشعارات الطلبات" style="background:transparent;color:white;font-size:25px;padding:5px">🔔</button></div><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="width:100%;border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button>
 <div id="homeLocationPanel" class="panel hidden" style="margin:10px 0 0;background:#242424;text-align:right">
  <button type="button" class="primary" id="useCurrentLocationBtn" style="width:100%;background:#4165df">🎯 استخدام موقعي الحالي</button>
  <p id="homeLocationStatus" class="muted" aria-live="polite">حدد موقعك ليسهل توصيل طلباتك.</p>
@@ -61,6 +61,30 @@ const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
 const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
 
 function urlBase64ToUint8Array(base64String){const padding="=".repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(base64);return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));}
+document.getElementById("customerBellBtn").addEventListener("click",async()=>{
+ const bell=document.getElementById("customerBellBtn");
+ if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window)){
+  alert("متصفحك لا يدعم إشعارات التطبيق. افتح الرابط بمتصفح Chrome أو ثبّت التطبيق أولاً.");return;
+ }
+ bell.disabled=true;
+ try{
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted"){
+   alert(permission==="denied"?"إشعارات التطبيق محظورة. فعّلها من إعدادات الموقع في المتصفح.":"لم يتم السماح بالإشعارات.");
+   return;
+  }
+  const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});
+  const keyData=await keyRes.json().catch(()=>({}));
+  if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر الاتصال بخدمة الإشعارات. حاول لاحقاً.");
+  const reg=await navigator.serviceWorker.register("./service-worker.js");
+  await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub)await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});
+  alert("✅ تم السماح بإشعارات ديليفري الأتارب على هذا الجهاز. وسيتم ربط إشعارات تحديث الطلب عند تسجيل طلبك.");
+  bell.textContent="🔔";
+ }catch(err){console.error("Customer notification setup:",err);alert(err.message||"تعذر تفعيل الإشعارات.");}
+ finally{bell.disabled=false;}
+});
 async function enableOrderPush(orderNumber,phone){try{if(!("Notification"in window)||!("serviceWorker"in navigator)||!("PushManager"in window))throw Error("المتصفح لا يدعم إشعارات الطلبات. جرّب Chrome على الهاتف.");const permission=await Notification.requestPermission();if(permission!=="granted")throw Error("ما وافقت على الإشعارات؛ طلبك ما زال مسجلاً.");const keyRes=await fetch(SUPABASE_URL+"/functions/v1/push-public-key",{headers:{apikey:SUPABASE_KEY}});const keyData=await keyRes.json();if(!keyRes.ok||!keyData.vapid_public_key)throw Error("تعذر جلب إعدادات الإشعارات.");const reg=await navigator.serviceWorker.register("./service-worker.js");await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(keyData.vapid_public_key)});const saved=await api("rpc/register_order_push",{method:"POST",body:JSON.stringify({p_order_number:Number(orderNumber),p_customer_phone:phone,p_endpoint:sub.endpoint,p_subscription:sub.toJSON()})});if(!saved?.success)throw Error(saved?.message||"تعذر ربط الإشعار بالطلب؛ تأكد من رقم الهاتف.");alert("✅ تم تفعيل إشعارات الطلب رقم "+orderNumber);}catch(err){console.error(err);alert("الطلب مسجّل، لكن ما قدرنا نفعّل إشعاراته: "+(err.message||"خطأ غير معروف"));}}
 
 let customerLat=null,customerLng=null,customerMap=null,customerMarker=null;
