@@ -43,33 +43,33 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 </section>
 <section id="cartView" class="hidden">
 <style>
-#cartView .delivery-layout{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:14px;align-items:start;direction:rtl;width:100%}
-#cartView .delivery-column{min-width:0;width:auto;max-width:100%}
+#cartView .delivery-choice-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;direction:rtl;margin-bottom:14px}
+#cartView .delivery-choice{border:1px solid #ff7626;border-radius:14px;background:#242424;color:#fff;padding:14px 8px;font-weight:800;font-size:14px;min-height:66px;cursor:pointer}
+#cartView .delivery-choice.active{background:#ff7626;border-color:#ff9a55}
+#cartView .delivery-content{width:100%;max-width:650px;margin:0 auto}
 #cartView .delivery-intro{background:#242424;border:1px solid #3b3b3b;border-radius:17px;padding:14px;margin:0 0 12px;line-height:1.8}
 #cartView .delivery-intro h2{font-size:18px;line-height:1.5;margin:0 0 7px;color:#ff9a55}
 #cartView .delivery-intro p{margin:0;color:#e0e0e0;font-size:13px}
 #cartView .delivery-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0}
 #cartView .delivery-step{display:flex;align-items:center;gap:8px;background:#242424;border:1px solid #3b3b3b;border-radius:14px;padding:10px;width:100%;text-align:right;color:#fff;cursor:pointer;flex-wrap:wrap}
 #cartView .delivery-step .step-number{width:30px;height:30px;flex:0 0 30px;border-radius:50%;display:grid;place-items:center;background:#ff7626;color:white;font-weight:800}
-#cartView .delivery-step b{font-size:14px}
 #cartView .step-hint{width:100%;padding-right:38px;color:#bdbdbd;font-size:11px}
-#cartView .delivery-arrow{text-align:center;color:#ff9a55;font-size:18px;line-height:10px}
 #cartView #customDeliveryForm,#cartView #basketCheckoutPanel{background:#242424;border:1px solid #383838;border-radius:16px;padding:12px;margin:0 0 10px;min-width:0}
 #cartView #customDeliveryForm h3,#cartView #basketCheckoutPanel h3{font-size:16px;margin:0 0 10px}
-#cartView .delivery-column label{font-size:12px}
-#cartView .delivery-column input,#cartView .delivery-column textarea{font-size:13px;padding:9px;margin:4px 0 9px}
-#cartView .delivery-column textarea{min-height:65px}
-#cartView #customDeliveryForm button,#cartView #basketCheckoutPanel button{font-size:12px;padding:9px}
+#cartView .delivery-content label{font-size:12px}
+#cartView .delivery-content input,#cartView .delivery-content textarea{font-size:13px;padding:9px;margin:4px 0 9px;width:100%;box-sizing:border-box}
+#cartView .delivery-content textarea{min-height:65px}
+#cartView .delivery-content button{font-size:12px;padding:9px}
 #cartView .add-delivery-box{margin:10px 0 0;padding:4px;background:#ff7626;border-radius:13px}
 #cartView .add-delivery-box button{width:100%;background:#ff7626;color:#fff;font-size:14px;font-weight:800;padding:12px;border:1px solid #ff9a55;border-radius:10px}
-@media(max-width:520px){#cartView .delivery-layout{gap:8px}#cartView .delivery-column{width:100%}#cartView .delivery-intro{padding:9px}#cartView .delivery-intro h2{font-size:14px}#cartView .delivery-intro p{font-size:11px}#cartView #customDeliveryForm,#cartView #basketCheckoutPanel{padding:8px}#cartView .delivery-column label{font-size:11px}#cartView .delivery-column input,#cartView .delivery-column textarea{font-size:11px;padding:7px}#cartView .delivery-step{padding:7px;gap:5px}#cartView .delivery-step b{font-size:12px}#cartView .delivery-step .step-number{width:24px;height:24px;flex-basis:24px;font-size:11px}#cartView .step-hint{padding-right:0;font-size:10px}#cartView .add-delivery-box button{font-size:11px;padding:9px}}
+@media(max-width:520px){#cartView .delivery-choice-row{gap:7px}#cartView .delivery-choice{font-size:12px;padding:10px 5px;min-height:60px}#cartView .delivery-content{max-width:100%}#cartView .delivery-intro{padding:9px}#cartView .delivery-intro h2{font-size:14px}#cartView .delivery-intro p{font-size:11px}#cartView #customDeliveryForm,#cartView #basketCheckoutPanel{padding:8px}}
 </style>
-<div class="delivery-layout">
-<div class="delivery-column" id="customDeliveryColumn">
-<div class="delivery-intro">
-<h2>توصيلة خاصة إلك 🚚</h2>
-<p>ما لقيت طلبك ضمن المتاجر الخاصة بنا؟ لا تقلق، سنقوم بتوصيل أي شيء لك. فقط أعطنا معلومات طلبك لنلبّيه لك.</p>
+<div class="delivery-choice-row" aria-label="اختيار نوع التوصيل">
+<button type="button" class="delivery-choice" id="chooseCustomDelivery">🚚 توصيـلة خاصة إلك</button>
+<button type="button" class="delivery-choice" id="chooseBasketDelivery">🛍️ بيانات توصيل الطلب</button>
 </div>
+<div class="delivery-content hidden" id="customDeliveryContent">
+<div class="delivery-intro"><h2>توصيلة خاصة إلك 🚚</h2><p>ما لقيت طلبك ضمن المتاجر الخاصة بنا؟ لا تقلق، سنقوم بتوصيل أي شيء لك. فقط أعطنا معلومات طلبك لنلبّيه لك.</p></div>
 <div class="delivery-steps" aria-label="خطوات إضافة توصيلة">
 <button type="button" class="delivery-step" data-focus="customStore"><span class="step-number">1</span><b>حدد المتجر</b><span class="step-hint" id="customStoreHint">اضغط لاختيار المتجر</span></button>
 <div class="delivery-arrow">↓</div>
@@ -81,20 +81,23 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 <h3>بيانات التوصيلة</h3>
 <label for="customStore">المتجر أو المكان المطلوب الشراء منه</label>
 <input id="customStore" list="customStoreOptions" required minlength="2" placeholder="اكتب اسم أي متجر أو اختر من الاقتراحات" autocomplete="off"><datalist id="customStoreOptions"></datalist><p class="muted">إذا ما لقيت المتجر بالقائمة، اكتب اسمه مباشرة.</p>
-<label for="customAddress">عنوان التوصيل بالتفصيل</label>
-<input id="customAddress" required minlength="5" placeholder="الحي، الشارع، البناء، أقرب نقطة دالة">
+<label for="customAddress">عنوان التوصيل بالتفصيل</label><input id="customAddress" required minlength="5" placeholder="الحي، الشارع، البناء، أقرب نقطة دالة">
 <button type="button" id="customUseLocation" class="small">📍 استخدم موقعي الحالي</button><p id="customLocationStatus" class="muted">يمكنك كتابة العنوان أو تحديد موقعك الحالي.</p>
-<label for="customDetails">تفاصيل الطلب</label>
-<textarea id="customDetails" required minlength="3" placeholder="اكتب شو بدك نشتريلك أو نوصلّك..."></textarea>
+<label for="customDetails">تفاصيل الطلب</label><textarea id="customDetails" required minlength="3" placeholder="اكتب شو بدك نشتريلك أو نوصلّك..."></textarea>
 <label for="customName">اسمك</label><input id="customName" required minlength="2" placeholder="الاسم الكامل">
 <label for="customPhone">رقم الهاتف</label><input id="customPhone" required minlength="5" inputmode="tel" placeholder="رقم للتواصل">
 </form>
 <div class="add-delivery-box"><button type="submit" form="customDeliveryForm" id="addDeliveryBtn">＋ إضافة توصيلة وإرسال الطلب</button></div>
 </div>
-<div class="delivery-column" id="basketOrderColumn">
+<div class="delivery-content hidden" id="basketDeliveryContent">
 <div id="cartItems" class="hidden"></div>
-<div class="panel" id="basketCheckoutPanel"><h3>بيانات توصيل الطلب</h3><form id="checkout"><label>الاسم الكامل</label><input name="name" required minlength="2" autocomplete="name" placeholder="اكتب اسمك"><label>رقم الهاتف</label><input name="phone" required minlength="5" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل"><label>عنوان التوصيل</label><input name="address" required minlength="5" autocomplete="street-address" placeholder="الحي والشارع وأقرب نقطة دالة"><label>ملاحظات إضافية (اختياري)</label><textarea name="notes" placeholder="أي ملاحظة للمطعم أو السائق"></textarea><button type="button" id="locateCustomerBtn">📍 تحديد موقع التوصيل</button><p id="locationStatus" class="muted">حدد موقعك على الخريطة قبل إرسال الطلب.</p><div id="customerMap" style="height:240px;border-radius:12px;display:none"></div><button class="primary" type="submit">إرسال الطلب</button></form><span id="total" class="hidden">0</span></div>
-</div>
+<div class="panel hidden" id="basketCheckoutPanel"><h3>بيانات توصيل الطلب</h3><form id="checkout">
+<label>الاسم الكامل</label><input name="name" required minlength="2" autocomplete="name" placeholder="اكتب اسمك">
+<label>رقم الهاتف</label><input name="phone" required minlength="5" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل">
+<label>عنوان التوصيل</label><input name="address" required minlength="5" autocomplete="street-address" placeholder="الحي والشارع وأقرب نقطة دالة">
+<label>ملاحظات إضافية (اختياري)</label><textarea name="notes" placeholder="أي ملاحظة للمطعم أو السائق"></textarea>
+<button type="button" id="locateCustomerBtn">📍 تحديد موقع التوصيل</button><p id="locationStatus" class="muted">حدد موقعك على الخريطة قبل إرسال الطلب.</p><div id="customerMap" style="height:240px;border-radius:12px;display:none"></div>
+<button class="primary" type="submit">إرسال الطلب</button></form><span id="total" class="hidden">0</span></div>
 </div>
 </section>
 <section id="ordersView" class="hidden"><h2>📦 طلباتي</h2><div id="ordersList"></div></section>
@@ -236,6 +239,9 @@ function renderOrders(){let el=document.getElementById("ordersList");el.innerHTM
 // Custom delivery request flow
 let customDeliveryLat=null,customDeliveryLng=null;
 function focusCustomStep(id){const el=document.getElementById(id);if(!el)return;el.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{el.focus({preventScroll:true});if(id==="customStore"){try{el.showPicker?.();}catch{}}},250);}
+function selectDeliveryService(which){const custom=which==="custom";document.getElementById("customDeliveryContent").classList.toggle("hidden",!custom);document.getElementById("basketDeliveryContent").classList.toggle("hidden",custom);document.getElementById("chooseCustomDelivery").classList.toggle("active",custom);document.getElementById("chooseBasketDelivery").classList.toggle("active",!custom);if(!custom)renderCart();}
+document.getElementById("chooseCustomDelivery").addEventListener("click",()=>selectDeliveryService("custom"));
+document.getElementById("chooseBasketDelivery").addEventListener("click",()=>selectDeliveryService("basket"));
 document.querySelectorAll("#cartView [data-focus]").forEach(b=>b.addEventListener("click",()=>focusCustomStep(b.dataset.focus)));
 function refreshCustomStoreOptions(){
  const list=document.getElementById("customStoreOptions");
