@@ -23,7 +23,69 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 #ordersView .muted,#profileView .muted,#profileView .profile-identity span{color:var(--muted)}
 #ordersView input,#profileView input,#ordersView textarea,#profileView textarea{background:var(--card);color:var(--ink);border-color:var(--line)}
 #profileView .profile-menu-row{color:var(--ink)}
-html.light-theme body{background:var(--bg);color:var(--ink)}html.light-theme .panel,html.light-theme .profile-top-card,html.light-theme .profile-menu-card{background:#fff;border-color:#ddd}html.light-theme input,html.light-theme textarea,html.light-theme select{background:#fff;color:#222;border-color:#ccc}html.light-theme .profile-menu-row{color:#222}html.light-theme .profile-avatar{background:#eee}html.light-theme .theme-options button{background:#eee;color:#222}\n</style> <link rel="manifest" href="./manifest.json">
+html.light-theme body{background:var(--bg);color:var(--ink)}html.light-theme .panel,html.light-theme .profile-top-card,html.light-theme .profile-menu-card{background:#fff;border-color:#ddd}html.light-theme input,html.light-theme textarea,html.light-theme select{background:#fff;color:#222;border-color:#ccc}html.light-theme .profile-menu-row{color:#222}html.light-theme .profile-avatar{background:#eee}html.light-theme .theme-options button{background:#eee;color:#222}\n
+/* الوضع الفاتح: خلفيات فاتحة ونصوص سوداء في جميع صفحات التطبيق */
+html.light-theme body{background:#f4f4f4;color:#111}
+html.light-theme main,
+html.light-theme main section{color:#111}
+html.light-theme .panel,
+html.light-theme .card,
+html.light-theme #stores .card,
+html.light-theme #products .card,
+html.light-theme #storeDetailProducts .card,
+html.light-theme .profile-top-card,
+html.light-theme .profile-menu-card,
+html.light-theme .notification-panel,
+html.light-theme .notification-item,
+html.light-theme #savedBasketsPanel,
+html.light-theme #cartView #customDeliveryForm,
+html.light-theme #cartView #basketCheckoutPanel,
+html.light-theme #cartView .delivery-intro,
+html.light-theme #cartView .delivery-step{background:#fff!important;color:#111!important;border-color:#ddd!important}
+html.light-theme main h1,
+html.light-theme main h2,
+html.light-theme main h3,
+html.light-theme main h4,
+html.light-theme main p,
+html.light-theme main label,
+html.light-theme main b,
+html.light-theme main strong,
+html.light-theme main span,
+html.light-theme main li,
+html.light-theme main small,
+html.light-theme main summary,
+html.light-theme main .item,
+html.light-theme .notification-panel,
+html.light-theme .notification-panel *,
+html.light-theme #cartView .delivery-intro p,
+html.light-theme #cartView .delivery-step,
+html.light-theme #cartView .step-hint{color:#111}
+html.light-theme .muted,
+html.light-theme .card p,
+html.light-theme #stores .card p,
+html.light-theme #products .card p,
+html.light-theme #storeDetailProducts .card p,
+html.light-theme .profile-identity span{color:#555!important}
+html.light-theme input,
+html.light-theme textarea,
+html.light-theme select{background:#fff!important;color:#111!important;border-color:#bbb!important}
+html.light-theme input::placeholder,
+html.light-theme textarea::placeholder{color:#666}
+html.light-theme .store-filter-tabs button,
+html.light-theme .theme-options button,
+html.light-theme .profile-edit-btn{background:#e9e9e9;color:#111}
+html.light-theme nav{background:#fff;border-color:#ddd}
+html.light-theme nav button{color:#333}
+html.light-theme nav button.active{color:#ff7626}
+html.light-theme .location-chip{background:#fff;color:#111}
+html.light-theme .delivery-choice{background:#fff!important;color:#111!important}
+html.light-theme .delivery-choice.active,
+html.light-theme button.primary,
+html.light-theme .store-filter-tabs button.active,
+html.light-theme .theme-options button.active,
+html.light-theme #cartView .add-delivery-box button{background:#ff7626!important;color:#fff!important}
+
+</style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#4165df">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
