@@ -15,77 +15,7 @@ main{max-width:900px;margin:auto;padding:14px 16px 28px}.intro{background:linear
 #products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#products .card{background:#252525;border:1px solid #363636;border-radius:17px;padding:10px;box-shadow:0 3px 10px #0003;min-width:0}#products .card h3{font-size:15px}#products .card p{color:#bdbdbd}#products .card img{height:125px!important}.emoji{font-size:35px}#storeDetailProducts{display:flex;flex-direction:column;gap:10px}#storeDetailProducts .card{display:grid;grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:12px;align-items:start;padding:10px;background:#252525;border:1px solid #3b3b3b;border-radius:15px;min-height:116px}#storeDetailProducts .card>img,#storeDetailProducts .card>.emoji{grid-column:1;grid-row:1/4;width:104px!important;height:104px!important;min-height:104px;object-fit:cover;border-radius:11px;background:#333;display:flex;align-items:center;justify-content:center;font-size:38px}#storeDetailProducts .card h3{grid-column:2;margin:2px 0 5px;font-size:16px}#storeDetailProducts .card p{grid-column:2;margin:0 0 7px;color:#c4c4c4;font-size:13px;line-height:1.5}#storeDetailProducts .card .price{grid-column:2;align-self:end;color:#ffb34d;font-size:15px;font-weight:800}.card h3{margin:7px 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:700;color:#ffb34d}.small{padding:7px 10px;font-size:13px}
 .panel{background:#242424;border:1px solid #383838;border-radius:16px;padding:16px;margin-bottom:12px}.hidden{display:none!important}input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid #555;border-radius:10px;margin:5px 0 12px;background:#303030;color:white}label{font-size:14px;font-weight:600}textarea{min-height:70px}hr{border:0;border-top:1px solid var(--line);margin:14px 0}.item{padding:10px 0;border-bottom:1px solid var(--line)}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{background:#59421d;color:#ffe2a6;padding:12px;border-radius:12px;font-size:13px;margin:12px 0}.success{background:#174a2a;padding:12px;border-radius:12px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}a{color:#ff9b59}
 @media(min-width:650px){#stores{grid-template-columns:repeat(2,minmax(0,1fr))}#products{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.notification-panel{position:absolute;top:76px;left:12px;right:12px;z-index:30;max-height:65vh;overflow:auto;background:#242424;border:1px solid #555;border-radius:16px;padding:14px;box-shadow:0 8px 25px #0008}.notification-item{padding:12px 4px;border-bottom:1px solid #444}.notification-item:last-child{border:0}.notification-item b{display:block;margin-bottom:4px}.notification-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}\n.profile-top-card{display:flex;align-items:center;gap:12px;background:#242424;border:1px solid #383838;border-radius:16px;padding:13px;margin-bottom:12px}.profile-avatar{width:58px;height:58px;flex:0 0 58px;border-radius:50%;background:#383838;display:grid;place-items:center;font-size:29px;position:relative;overflow:hidden;cursor:pointer}.profile-avatar img{width:100%;height:100%;object-fit:cover}.avatar-camera{position:absolute;bottom:0;right:0;background:#ff7626;border-radius:50%;font-size:13px;width:20px;height:20px;text-align:center;color:#fff}.profile-identity{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}.profile-identity b{font-size:16px}.profile-identity span{font-size:13px;color:var(--muted)}.profile-edit-btn{background:#383838;color:#fff;font-size:19px}.profile-menu-card{background:#242424;border:1px solid #383838;border-radius:16px;padding:5px 13px;margin-bottom:12px}.profile-menu-heading{font-weight:800;padding:12px 2px 8px}.profile-menu-row{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;color:var(--ink);padding:13px 2px;border-bottom:1px solid var(--line);text-align:right}.profile-menu-row:last-child{border-bottom:0}.profile-subpanel{padding:8px 0 12px}.saved-address-item{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.theme-options{display:flex;gap:8px;padding:4px 0 12px}.theme-options button{flex:1;background:#383838;color:var(--ink);padding:9px 4px}.theme-options button.active{background:#ff7626;color:white}.profile-detail{border-top:1px solid var(--line);padding:12px 2px}.profile-detail summary{cursor:pointer;font-weight:600}.profile-detail p{font-size:13px;line-height:1.8;color:var(--muted)}.profile-logout{width:100%;background:#7d2525;color:#fff;font-weight:800;margin:3px 0 18px}\n\n:root.light-theme{--bg:#f4f4f4;--ink:#202020;--muted:#666;--card:#fff;--line:#ddd}
-/* تباين مضمون لصفحتَي الطلبات والملف الشخصي في الوضعين */
-#ordersView,#profileView{background:var(--bg);color:var(--ink);min-height:60vh}
-#ordersView .panel,#profileView .panel,#profileView .profile-top-card,#profileView .profile-menu-card{background:var(--card);color:var(--ink);border-color:var(--line)}
-#ordersView h2,#profileView h2,#ordersView p,#profileView p,#profileView label,#profileView b,#profileView span,#profileView summary{color:var(--ink)}
-#ordersView .muted,#profileView .muted,#profileView .profile-identity span{color:var(--muted)}
-#ordersView input,#profileView input,#ordersView textarea,#profileView textarea{background:var(--card);color:var(--ink);border-color:var(--line)}
-#profileView .profile-menu-row{color:var(--ink)}
-html.light-theme body{background:var(--bg);color:var(--ink)}html.light-theme .panel,html.light-theme .profile-top-card,html.light-theme .profile-menu-card{background:#fff;border-color:#ddd}html.light-theme input,html.light-theme textarea,html.light-theme select{background:#fff;color:#222;border-color:#ccc}html.light-theme .profile-menu-row{color:#222}html.light-theme .profile-avatar{background:#eee}html.light-theme .theme-options button{background:#eee;color:#222}\n
-/* الوضع الفاتح: خلفيات فاتحة ونصوص سوداء في جميع صفحات التطبيق */
-html.light-theme body{background:#f4f4f4;color:#111}
-html.light-theme main,
-html.light-theme main section{color:#111}
-html.light-theme .panel,
-html.light-theme .card,
-html.light-theme #stores .card,
-html.light-theme #products .card,
-html.light-theme #storeDetailProducts .card,
-html.light-theme .profile-top-card,
-html.light-theme .profile-menu-card,
-html.light-theme .notification-panel,
-html.light-theme .notification-item,
-html.light-theme #savedBasketsPanel,
-html.light-theme #cartView #customDeliveryForm,
-html.light-theme #cartView #basketCheckoutPanel,
-html.light-theme #cartView .delivery-intro,
-html.light-theme #cartView .delivery-step{background:#fff!important;color:#111!important;border-color:#ddd!important}
-html.light-theme main h1,
-html.light-theme main h2,
-html.light-theme main h3,
-html.light-theme main h4,
-html.light-theme main p,
-html.light-theme main label,
-html.light-theme main b,
-html.light-theme main strong,
-html.light-theme main span,
-html.light-theme main li,
-html.light-theme main small,
-html.light-theme main summary,
-html.light-theme main .item,
-html.light-theme .notification-panel,
-html.light-theme .notification-panel *,
-html.light-theme #cartView .delivery-intro p,
-html.light-theme #cartView .delivery-step,
-html.light-theme #cartView .step-hint{color:#111}
-html.light-theme .muted,
-html.light-theme .card p,
-html.light-theme #stores .card p,
-html.light-theme #products .card p,
-html.light-theme #storeDetailProducts .card p,
-html.light-theme .profile-identity span{color:#555!important}
-html.light-theme input,
-html.light-theme textarea,
-html.light-theme select{background:#fff!important;color:#111!important;border-color:#bbb!important}
-html.light-theme input::placeholder,
-html.light-theme textarea::placeholder{color:#666}
-html.light-theme .store-filter-tabs button,
-html.light-theme .theme-options button,
-html.light-theme .profile-edit-btn{background:#e9e9e9;color:#111}
-html.light-theme nav{background:#fff;border-color:#ddd}
-html.light-theme nav button{color:#333}
-html.light-theme nav button.active{color:#ff7626}
-html.light-theme .location-chip{background:#fff;color:#111}
-html.light-theme .delivery-choice{background:#fff!important;color:#111!important}
-html.light-theme .delivery-choice.active,
-html.light-theme button.primary,
-html.light-theme .store-filter-tabs button.active,
-html.light-theme .theme-options button.active,
-html.light-theme #cartView .add-delivery-box button{background:#ff7626!important;color:#fff!important}
-
-</style> <link rel="manifest" href="./manifest.json">
+.notification-panel{position:absolute;top:76px;left:12px;right:12px;z-index:30;max-height:65vh;overflow:auto;background:#242424;border:1px solid #555;border-radius:16px;padding:14px;box-shadow:0 8px 25px #0008}.notification-item{padding:12px 4px;border-bottom:1px solid #444}.notification-item:last-child{border:0}.notification-item b{display:block;margin-bottom:4px}.notification-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}\n.profile-top-card{display:flex;align-items:center;gap:12px;background:#242424;border:1px solid #383838;border-radius:16px;padding:13px;margin-bottom:12px}.profile-avatar{width:58px;height:58px;flex:0 0 58px;border-radius:50%;background:#383838;display:grid;place-items:center;font-size:29px;position:relative;overflow:hidden;cursor:pointer}.profile-avatar img{width:100%;height:100%;object-fit:cover}.avatar-camera{position:absolute;bottom:0;right:0;background:#ff7626;border-radius:50%;font-size:13px;width:20px;height:20px;text-align:center;color:#fff}.profile-identity{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}.profile-identity b{font-size:16px}.profile-identity span{font-size:13px;color:var(--muted)}.profile-edit-btn{background:#383838;color:#fff;font-size:19px}.profile-menu-card{background:#242424;border:1px solid #383838;border-radius:16px;padding:5px 13px;margin-bottom:12px}.profile-menu-heading{font-weight:800;padding:12px 2px 8px}.profile-menu-row{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;color:var(--ink);padding:13px 2px;border-bottom:1px solid var(--line);text-align:right}.profile-menu-row:last-child{border-bottom:0}.profile-subpanel{padding:8px 0 12px}.saved-address-item{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.theme-options{display:flex;gap:8px;padding:4px 0 12px}.theme-options button{flex:1;background:#383838;color:var(--ink);padding:9px 4px}.theme-options button.active{background:#ff7626;color:white}.profile-detail{border-top:1px solid var(--line);padding:12px 2px}.profile-detail summary{cursor:pointer;font-weight:600}.profile-detail p{font-size:13px;line-height:1.8;color:var(--muted)}.profile-logout{width:100%;background:#7d2525;color:#fff;font-weight:800;margin:3px 0 18px}\n\n</style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#4165df">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script></head>
@@ -366,13 +296,13 @@ document.getElementById("checkout").addEventListener("submit",async e=>{e.preven
 let customerSession=null;
 let customerLoginMode=false;
 function customerMessage(msg){document.getElementById("customerAuthMessage").textContent=msg;}
-function renderCustomerProfile(){const auth=document.getElementById("customerAuthPanel"),panel=document.getElementById("customerProfilePanel");if(!customerSession?.user){auth.classList.remove("hidden");panel.classList.add("hidden");return;}auth.classList.add("hidden");panel.classList.remove("hidden");const u=customerSession.user,m=u.user_metadata||{};document.getElementById("profileFullName").value=m.full_name||"";document.getElementById("profileEmailInput").value=u.email||"";document.getElementById("profilePhone").value=m.phone||"";document.getElementById("profileAddress").value=m.address||"";document.getElementById("profileDisplayName").textContent=m.full_name||"اسم المستخدم";document.getElementById("profileDisplayPhone").textContent=m.phone||"أضف رقم هاتفك";const photo=localStorage.getItem("ata_profile_photo");document.getElementById("profileAvatarImg").classList.toggle("hidden",!photo);document.getElementById("profileAvatarPlaceholder").classList.toggle("hidden",!!photo);if(photo)document.getElementById("profileAvatarImg").src=photo;renderSavedAddresses();applyTheme(localStorage.getItem("ata_theme")||"auto");}
+function renderCustomerProfile(){const auth=document.getElementById("customerAuthPanel"),panel=document.getElementById("customerProfilePanel");if(!customerSession?.user){auth.classList.remove("hidden");panel.classList.add("hidden");return;}auth.classList.add("hidden");panel.classList.remove("hidden");const u=customerSession.user,m=u.user_metadata||{};document.getElementById("profileFullName").value=m.full_name||"";document.getElementById("profileEmailInput").value=u.email||"";document.getElementById("profilePhone").value=m.phone||"";document.getElementById("profileAddress").value=m.address||"";document.getElementById("profileDisplayName").textContent=m.full_name||"اسم المستخدم";document.getElementById("profileDisplayPhone").textContent=m.phone||"أضف رقم هاتفك";const photo=localStorage.getItem("ata_profile_photo");document.getElementById("profileAvatarImg").classList.toggle("hidden",!photo);document.getElementById("profileAvatarPlaceholder").classList.toggle("hidden",!!photo);if(photo)document.getElementById("profileAvatarImg").src=photo;renderSavedAddresses();applyTheme("dark");}
 function setCustomerMode(login){customerLoginMode=login;document.getElementById("customerName").classList.toggle("hidden",login);document.getElementById("customerPhone").classList.toggle("hidden",login);document.getElementById("customerAddress").classList.toggle("hidden",login);document.getElementById("customerSignupBtn").textContent=login?"تسجيل الدخول":"إنشاء حساب";document.getElementById("customerLoginBtn").textContent=login?"إنشاء حساب جديد":"عندي حساب — تسجيل الدخول";document.getElementById("customerPassword").autocomplete=login?"current-password":"new-password";customerMessage(login?"أدخل بريدك وكلمة المرور لتسجيل الدخول.":"أنشئ حسابك ببياناتك.");}
 document.getElementById("customerLoginBtn").addEventListener("click",()=>setCustomerMode(!customerLoginMode));
 document.getElementById("customerAuthForm").addEventListener("submit",async e=>{e.preventDefault();const btn=document.getElementById("customerSignupBtn");btn.disabled=true;customerMessage("جارٍ تنفيذ الطلب...");const email=document.getElementById("customerEmail").value.trim(),password=document.getElementById("customerPassword").value;const metadata={full_name:document.getElementById("customerName").value.trim(),phone:document.getElementById("customerPhone").value.trim(),address:document.getElementById("customerAddress").value.trim()};try{const data=customerLoginMode?await adminAuth("token?grant_type=password",{method:"POST",body:JSON.stringify({email,password})}):await adminAuth("signup",{method:"POST",body:JSON.stringify({email,password,data:metadata})});if(!customerLoginMode&&!data.access_token){customerMessage("تم إنشاء الحساب. إذا كان تأكيد البريد مفعّلاً، افتح رسالة البريد ثم سجّل الدخول.");return;}customerSession=data;if(!customerLoginMode&&data.user){customerSession.user.user_metadata={...(customerSession.user.user_metadata||{}),...metadata};}localStorage.setItem("ata_customer_session",JSON.stringify(customerSession));document.getElementById("customerPassword").value="";renderCustomerProfile();customerMessage("تم تسجيل الدخول بنجاح.");}catch(err){const em=String(err.message||"");if(/only request this after|security purposes|rate.?limit|too many requests/i.test(em)){customerMessage("لحماية الحسابات، لازم تنتظر قبل إعادة طلب إنشاء الحساب. انتظر 60 ثانية بدون ضغط، ثم جرّب مرة واحدة.");btn.disabled=true;let left=60;const oldText=btn.textContent;btn.textContent="انتظر "+left+" ثانية";const timer=setInterval(()=>{left--;if(left<=0){clearInterval(timer);btn.disabled=false;btn.textContent=oldText;}else{btn.textContent="انتظر "+left+" ثانية";}},1000);}else{customerMessage(em||"تعذر تسجيل الدخول. تأكد من البيانات وحاول مجدداً.");}}finally{if(!btn.textContent.startsWith("انتظر "))btn.disabled=false;}});
 document.getElementById("saveProfileBtn").addEventListener("click",async()=>{if(!customerSession?.access_token)return;const msg=document.getElementById("profileMessage");try{const data=await adminAuth("user",{method:"PUT",headers:{Authorization:"Bearer "+customerSession.access_token},body:JSON.stringify({data:{...(customerSession.user.user_metadata||{}),full_name:document.getElementById("profileFullName").value.trim(),phone:document.getElementById("profilePhone").value.trim(),address:document.getElementById("profileAddress").value.trim()}})});customerSession.user=data;localStorage.setItem("ata_customer_session",JSON.stringify(customerSession));renderCustomerProfile();msg.textContent="✅ تم حفظ بياناتك بنجاح. أنت الآن في صفحة ملفك الشخصي.";showView("profile");}catch(err){msg.textContent=err.message||"تعذر حفظ البيانات.";}});
 // زر طلباتي غير موجود ضمن تصميم الملف الشخصي؛ التنقل يتم من الشريط السفلي.
-function applyTheme(theme){localStorage.setItem("ata_theme",theme);const light=theme==="light"||(theme==="auto"&&window.matchMedia("(prefers-color-scheme: light)").matches);document.documentElement.classList.toggle("light-theme",light);document.querySelectorAll("[data-theme-choice]").forEach(b=>b.classList.toggle("active",b.dataset.themeChoice===theme));}
+function applyTheme(){document.documentElement.classList.remove("light-theme");document.querySelectorAll("[data-theme-choice]").forEach(b=>b.classList.toggle("active",b.dataset.themeChoice==="dark"));}
 function renderSavedAddresses(){const list=document.getElementById("savedAddressesList");if(!list)return;const items=JSON.parse(localStorage.getItem("ata_saved_addresses")||"[]");list.innerHTML=items.length?items.map((v,i)=>'<div class="saved-address-item"><span>'+escapeHtml(v)+'</span><button type="button" class="small" onclick="deleteSavedAddress('+i+')">حذف</button></div>').join(""):'<p class="muted">ما أضفت عناوين محفوظة بعد.</p>';}
 function deleteSavedAddress(i){const items=JSON.parse(localStorage.getItem("ata_saved_addresses")||"[]");items.splice(i,1);localStorage.setItem("ata_saved_addresses",JSON.stringify(items));renderSavedAddresses();}
 document.getElementById("editProfileBtn").addEventListener("click",()=>document.getElementById("profileEditPanel").classList.toggle("hidden"));
@@ -380,7 +310,7 @@ document.getElementById("cancelProfileEdit").addEventListener("click",()=>docume
 document.getElementById("profilePhotoInput").addEventListener("change",e=>{const f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith("image/"))return alert("اختر صورة فقط.");const reader=new FileReader();reader.onload=()=>{localStorage.setItem("ata_profile_photo",reader.result);renderCustomerProfile();};reader.readAsDataURL(f);});
 document.getElementById("savedAddressesBtn").addEventListener("click",()=>document.getElementById("savedAddressesPanel").classList.toggle("hidden"));
 document.getElementById("addSavedAddressBtn").addEventListener("click",()=>{const input=document.getElementById("newSavedAddress"),v=input.value.trim();if(!v)return;const items=JSON.parse(localStorage.getItem("ata_saved_addresses")||"[]");items.push(v);localStorage.setItem("ata_saved_addresses",JSON.stringify(items));input.value="";renderSavedAddresses();});
-document.querySelectorAll("[data-theme-choice]").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.themeChoice)));
+// خيارات المظهر للعرض فقط حالياً؛ التطبيق يعمل بالمظهر الداكن.
 document.getElementById("inviteFriendsBtn").addEventListener("click",shareApp);
 document.getElementById("shareAppBtn").addEventListener("click",shareApp);
 async function shareApp(){const data={title:"ديليفري الأتارب",text:"جرّب تطبيق ديليفري الأتارب لطلب احتياجاتك وتوصيلها بسهولة.",url:location.origin+location.pathname};if(navigator.share){try{await navigator.share(data);}catch(e){}}else{try{await navigator.clipboard.writeText(data.url);alert("تم نسخ رابط التطبيق.");}catch{prompt("انسخ رابط التطبيق:",data.url);}}}
