@@ -1,4 +1,65 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة المطعم - ديليفري الأتارب</title><style>body{font-family:system-ui,Tahoma,Arial;background:#f4f7f5;color:#17211b;margin:0}header{background:#16834a;color:white;padding:18px}main{max-width:900px;margin:auto;padding:16px}.panel{background:white;border:1px solid #dfe8e2;border-radius:14px;padding:16px;margin:12px 0}button{background:#16834a;color:white;border:0;border-radius:10px;padding:10px 14px;font:inherit;cursor:pointer;margin:4px}input,select{font:inherit;padding:10px;border:1px solid #ccd7d0;border-radius:9px;width:100%;box-sizing:border-box;margin:6px 0 12px}.muted{color:#64746a}.hidden{display:none!important}.row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.danger{background:#a72b2b}a{color:white}</style><style>#profilePanel .profile-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}#profilePanel .profile-fields label{display:block}#profilePanel .profile-fields input{margin:6px 0 12px}#profilePanel .profile-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}@media(max-width:650px){#profilePanel .profile-fields{grid-template-columns:1fr}}</style><style>body{background:#171717;color:#f5f5f5}header{background:#222;border-bottom:1px solid #333}main{padding-bottom:100px}.panel{background:#242424;border-color:#393939;color:#f5f5f5}.muted{color:#b8b8b8}input,select{background:#303030;color:#fff;border-color:#555}.dashboard-bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#292929;border-top:1px solid #444}.dashboard-bottom-nav button{width:48%;display:flex;align-items:center;justify-content:center;gap:8px;background:#333;color:#ddd;border-radius:14px;padding:13px;font-weight:700}.dashboard-bottom-nav button.active{background:#ff7626;color:#fff}.dashboard-bottom-nav span{font-size:14px}#profilePanel{margin-top:12px}#profilePanel .profile-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(max-width:600px){#profilePanel .profile-fields{grid-template-columns:1fr}}</style></head><body><header><h2>لوحة المطعم</h2><div>ديليفري الأتارب • <a href="./">واجهة الزبون</a></div></header><main><section id="login" class="panel"><h3>تسجيل الدخول</h3><label>البريد الإلكتروني</label><input id="email" type="email" required><label>كلمة المرور</label><input id="password" type="password" required><button id="loginBtn">دخول</button><p id="message" class="muted">الدخول مخصص للحسابات المصرّح لها فقط.</p></section><section id="app" class="hidden"><div class="panel" id="profilePanel" class="panel hidden"><div class="row"><h3>👤 ملفي الشخصي</h3><button class="danger" type="button" onclick="logoutAccount()">تسجيل الخروج</button></div><p class="muted" id="profileEmail"></p><div class="profile-fields"><div><label>الاسم</label><input id="profileName" maxlength="100" placeholder="اسمك"></div><div><label>رقم الهاتف</label><input id="profilePhone" maxlength="30" placeholder="رقم الهاتف"></div><div><label>كلمة مرور جديدة (اختياري)</label><input id="profilePassword" type="password" minlength="8" placeholder="اتركها فارغة إذا لا تريد تغييرها"></div></div><div class="profile-actions"><button type="button" onclick="saveProfile()">حفظ بياناتي</button><p id="profileStatus" class="muted" role="status"></p></div></div><div id="dashboardContent">lass="row"><h3>لوحة المطعم</h3><div><button onclick="start()">تحديث الطلبات</button></div><button id="enableStorePush" type="button">🔔 تفعيل إشعارات المطعم</button></div><p id="storePushStatus" class="muted" aria-live="polite">فعّل الإشعارات على هذا الجهاز لاستقبال الطلبات الجديدة.</p><p class="muted" id="scopeNote">تعرض الطلبات الخاصة بالمطعم المحدد.</p><div id="adminStorePicker" class="hidden"><label>اختر المطعم</label><select id="storeSelect" onchange="start()"></select></div><div id="orders"></div></div><nav class="dashboard-bottom-nav"><button type="button" onclick="showDashboardTab('profile')">👤<span>ملفي الشخصي</span></button><button type="button" class="active" onclick="showDashboardTab('orders')">📦<span>الطلبات</span></button></nav></section></main><script>
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4165df">
+<meta name="description" content="لوحة مطعم ديليفري الأتارب">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>المطعم | ديليفري الأتارب</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--brand:#4165df;--accent:#ff7626;--bg:#171717;--surface:#222;--surface2:#292929;--line:#383838;--text:#f7f7f7;--muted:#bdbdbd;--success:#39b978;--danger:#c84b4b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0 0 calc(90px + env(safe-area-inset-bottom));font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+header{position:sticky;top:0;z-index:50;background:var(--brand);color:#fff;padding:10px 14px;box-shadow:0 3px 14px #0004}
+.brandbar{max-width:900px;margin:auto;display:flex;align-items:center;gap:10px}
+.brand-logo{width:42px;height:42px;object-fit:cover;border-radius:12px;background:#fff;flex:0 0 42px}
+.brand-title{min-width:0;flex:1}.brand-title h1{font-size:17px;margin:0;font-weight:850}.brand-title p{font-size:11px;margin:3px 0 0;opacity:.9}
+.header-link{color:#fff;text-decoration:none;font-size:12px;font-weight:700;background:#ffffff20;padding:9px 11px;border-radius:12px;white-space:nowrap}
+main{max-width:900px;margin:auto;padding:14px 14px 30px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 5px 18px #0002}
+h2,h3,h4{margin-top:0}h3{font-size:18px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 15px;background:var(--accent);color:#fff;font-weight:750;transition:filter .15s,transform .15s}
+button:active{transform:scale(.98)}button:disabled{opacity:.55;cursor:wait}
+input,select{font:inherit;color:#fff;background:#303030;border:1px solid #505050;border-radius:11px;width:100%;padding:12px;margin:7px 0 14px;min-height:46px}
+label{display:block;font-size:13px;color:#ddd;font-weight:700}
+.muted{color:var(--muted);font-size:13px;line-height:1.65}
+.hidden{display:none!important}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.danger{background:var(--danger)}
+#login{max-width:520px;margin:28px auto}
+#login h3{margin-bottom:18px}
+#loginBtn{width:100%;min-height:48px}
+#dashboardContent>.row{background:linear-gradient(120deg,#263b83,#4165df);border-radius:18px;padding:17px;margin:0 0 12px}
+#dashboardContent>.row h3{margin:0;color:white}
+#dashboardContent>.row button{background:#fff;color:#2947a5}
+#dashboardContent>p{padding:0 4px}
+#profilePanel .profile-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#profilePanel .profile-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.tabs button{background:#2c2c2c;color:#ddd;border:1px solid #454545;padding:12px 8px;font-size:13px}
+.tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+#orders>.tabs{position:sticky;top:65px;z-index:10;background:var(--bg);padding:7px 0}
+#orders article.panel{border-radius:17px}
+#orders article.panel[style*="border:2px"]{background:#222!important;border-color:#39b978!important}
+#orders article .row{padding-bottom:8px;border-bottom:1px solid var(--line)}
+#orders article p{line-height:1.7}
+#orders article h4{margin:15px 0 8px}
+#orders article ul{padding-right:22px;line-height:1.9}
+#orders article button{width:100%;margin:10px 0 0;min-height:48px}
+#orders article a{color:#fff}
+.map{height:230px;border-radius:14px;overflow:hidden;margin:12px 0;border:1px solid var(--line)}
+.dashboard-bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#292929;border-top:1px solid #444;box-shadow:0 -5px 20px #0004}
+.dashboard-bottom-nav button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;color:#bdbdbd;border-radius:13px;padding:12px 8px;font-weight:750}
+.dashboard-bottom-nav button.active{background:#ff7626;color:#fff}
+.dashboard-bottom-nav span{font-size:13px}
+a{color:#8da8ff}
+@media(max-width:600px){main{padding:12px 11px 24px}#profilePanel .profile-fields{grid-template-columns:1fr}.panel{padding:14px}.brand-title h1{font-size:15px}.header-link{padding:8px;font-size:11px}#orders>.tabs{top:62px}}
+</style>
+</head><body><header><div class="brandbar"><img class="brand-logo" src="./icon-192.png" alt="شعار ديليفري الأتارب"><div class="brand-title"><h1>ديليفري الأتارب</h1><p>لوحة المطعم • إدارة الطلبات</p></div><a class="header-link" href="./">واجهة الزبون</a></div></header><main><section id="login" class="panel"><h3>تسجيل الدخول</h3><label>البريد الإلكتروني</label><input id="email" type="email" required><label>كلمة المرور</label><input id="password" type="password" required><button id="loginBtn">دخول</button><p id="message" class="muted">الدخول مخصص للحسابات المصرّح لها فقط.</p></section><section id="app" class="hidden"><div class="panel hidden" id="profilePanel"><div class="row"><h3>👤 ملفي الشخصي</h3><button class="danger" type="button" onclick="logoutAccount()">تسجيل الخروج</button></div><p class="muted" id="profileEmail"></p><div class="profile-fields"><div><label>الاسم</label><input id="profileName" maxlength="100" placeholder="اسمك"></div><div><label>رقم الهاتف</label><input id="profilePhone" maxlength="30" placeholder="رقم الهاتف"></div><div><label>كلمة مرور جديدة (اختياري)</label><input id="profilePassword" type="password" minlength="8" placeholder="اتركها فارغة إذا لا تريد تغييرها"></div></div><div class="profile-actions"><button type="button" onclick="saveProfile()">حفظ بياناتي</button><p id="profileStatus" class="muted" role="status"></p></div></div><div id="dashboardContent"><div class="row"><h3>لوحة المطعم</h3><button type="button" onclick="start()">تحديث الطلبات</button></div><div class="panel"><button id="enableStorePush" type="button">🔔 تفعيل إشعارات المطعم</button><p id="storePushStatus" class="muted" aria-live="polite">فعّل الإشعارات على هذا الجهاز لاستقبال الطلبات الجديدة.</p></div><p class="muted" id="scopeNote">تعرض الطلبات الخاصة بالمطعم المحدد.</p><div id="adminStorePicker" class="hidden"><label>اختر المطعم</label><select id="storeSelect" onchange="start()"></select></div><div id="orders"></div></div><nav class="dashboard-bottom-nav"><button type="button" onclick="showDashboardTab('profile')">👤<span>ملفي الشخصي</span></button><button type="button" class="active" onclick="showDashboardTab('orders')">📦<span>الطلبات</span></button></nav></section></main><script>
 function showDashboardTab(tab){const p=document.getElementById("profilePanel"),d=document.getElementById("dashboardContent");const isProfile=tab==="profile";p.classList.toggle("hidden",!isProfile);d.classList.toggle("hidden",isProfile);document.querySelectorAll(".dashboard-bottom-nav button").forEach((b,i)=>b.classList.toggle("active",isProfile?i===0:i===1));if(isProfile)renderProfile();window.scrollTo({top:0,behavior:"smooth"});}const URL="https://apreejawamptetdflwcf.supabase.co",KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";let session=null;let isAdmin=false;const SESSION_KEY="delivery_restaurant_session_v1";
 function saveSession(){if(session)localStorage.setItem(SESSION_KEY,JSON.stringify(session));}
 function clearSession(){session=null;isAdmin=false;localStorage.removeItem(SESSION_KEY);}
