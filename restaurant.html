@@ -153,6 +153,7 @@ async function start(){
   storeId=a[0].store_id;
  }
  currentStoreId=storeId;await loadStoreImages();await loadRestaurantProducts();
+ currentStoreId=storeId;await loadStoreImages();await loadRestaurantProducts();
  const ps=await api("products?select=id,name,store_id&store_id=eq."+encodeURIComponent(storeId));
  const ids=ps.map(p=>p.id);
  if(!ids.length){document.getElementById("orders").innerHTML='<div class="panel">لا توجد منتجات مرتبطة بهذا المطعم.</div>';return;}
