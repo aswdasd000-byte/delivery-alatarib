@@ -89,13 +89,13 @@ document.getElementById("addStoreProductBtn").addEventListener("click",async()=>
  const b=document.getElementById("addStoreProductBtn"),s=document.getElementById("storeProductStatus");b.disabled=true;s.textContent="جارٍ حفظ المنتج...";
  try{
   if(!currentStoreId)throw Error("لم يتم تحديد المطعم المرتبط بالحساب.");
-  const name=document.getElementById("storeProductName").value.trim(),category=document.getElementById("storeProductCategory").value.trim()||"عام",price=Number(document.getElementById("storeProductPrice").value),description=document.getElementById("storeProductDescription").value.trim(),emoji=document.getElementById("storeProductEmoji").value.trim()||"🍽️";
+  const imageFile=document.getElementById("storeProductImage").files[0],name=document.getElementById("storeProductName").value.trim(),category=document.getElementById("storeProductCategory").value.trim()||"عام",price=Number(document.getElementById("storeProductPrice").value),description=document.getElementById("storeProductDescription").value.trim(),emoji=document.getElementById("storeProductEmoji").value.trim()||"🍽️";
   if(!name)throw Error("اكتب اسم المنتج.");
   if(!Number.isSafeInteger(price)||price<1)throw Error("أدخل سعراً صحيحاً أكبر من صفر.");
-  await api("products",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({store_id:currentStoreId,name,category,price_syp:price,description,emoji,is_available:true})});
-  ["storeProductName","storeProductPrice","storeProductDescription","storeProductCategory"].forEach(id=>document.getElementById(id).value="");
+  const image_url=imageFile?await uploadRestaurantImage(imageFile,"product","new"):null;await api("products",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({store_id:currentStoreId,name,category,price_syp:price,description,emoji,image_url,is_available:true})});
+  ["storeProductName","storeProductPrice","storeProductDescription","storeProductCategory","storeProductImage"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("storeProductEmoji").value="🍔";
-  s.textContent="تمت إضافة المنتج بنجاح.";await loadRestaurantProducts();
+  document.getElementById("storeProductImagePreview").classList.add("hidden");s.textContent="تمت إضافة المنتج مع صورته وحفظه بنجاح."await loadRestaurantProducts();
  }catch(e){s.textContent="تعذر إضافة المنتج: "+(e.message||"خطأ");}finally{b.disabled=false;}
 });
 async function toggleRestaurantProduct(id,available){
@@ -128,6 +128,7 @@ async function start(){
   if(!a.length){document.getElementById("orders").innerHTML='<div class="panel">حسابك غير مربوط بمطعم بعد. اطلب من المدير ربط حسابك بالمطعم.</div>';return;}
   storeId=a[0].store_id;
  }
+ currentStoreId=storeId;await loadStoreImages();await loadRestaurantProducts();
  const ps=await api("products?select=id,name,store_id&store_id=eq."+encodeURIComponent(storeId));
  const ids=ps.map(p=>p.id);
  if(!ids.length){document.getElementById("orders").innerHTML='<div class="panel">لا توجد منتجات مرتبطة بهذا المطعم.</div>';return;}
