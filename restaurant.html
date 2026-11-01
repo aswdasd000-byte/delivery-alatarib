@@ -99,16 +99,16 @@ async function start(){
  document.getElementById("orders").innerHTML=os.map(o=>{
   const its=items.filter(i=>i.order_id===o.id);
   let action=o.status==="جديد"
-   ?'<button onclick="updateStatus(\''+o.id+'\',\'قيد التحضير\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\''+o.id+'\',\'ملغي\')">رفض الطلب</button>'
+   ?'<button onclick="updateStatus(\\''+o.id+'\\',\\'قيد التحضير\\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\\''+o.id+'\\',\\'ملغي\\')">رفض الطلب</button>'
    :o.status==="قيد التحضير"
-    ?'<button onclick="updateStatus(\''+o.id+\'\',\'جاهز للاستلام\')">📦 الطلب جاهز — تسليمه للسائق</button>'
+    ?'<button onclick="updateStatus(\\''+o.id+'\\',\\'جاهز للاستلام\\')">📦 الطلب جاهز — تسليمه للسائق</button>'
     :o.status==="جاهز للاستلام"
-    ?'<p style="color:#16834a;font-weight:700">✅ الطلب جاهز للاستلام — بانتظار السائق.</p>'
-    :o.status==="بالطريق"
-     ?'<p style="color:#1769aa;font-weight:700">🛵 السائق استلم الطلب وهو بالطريق للزبون.</p>'
-     :o.status==="تم التسليم"
-      ?'<p style="color:#16834a;font-weight:700">✅ تم تسليم الطلب للزبون.</p>'
-      :'<p style="color:#a72b2b;font-weight:700">تم إلغاء الطلب.</p>';
+     ?'<p style="color:#16834a;font-weight:700">✅ الطلب جاهز للاستلام — بانتظار السائق.</p>'
+     :o.status==="بالطريق"
+      ?'<p style="color:#1769aa;font-weight:700">🛵 السائق استلم الطلب وهو بالطريق للزبون.</p>'
+      :o.status==="تم التسليم"
+       ?'<p style="color:#16834a;font-weight:700">✅ تم تسليم الطلب للزبون.</p>'
+       :'<p style="color:#a72b2b;font-weight:700">تم إلغاء الطلب.</p>';
   return '<article class="panel"><div class="row"><b>طلب #'+esc(o.order_number)+'</b><b>'+esc(o.status)+'</b></div><p><b>الزبون:</b> '+esc(o.customer_name)+' • '+esc(o.customer_phone)+'</p><p><b>العنوان:</b> '+esc(o.delivery_address)+'</p><ul>'+its.map(i=>'<li>'+esc(i.product_name)+' × '+esc(i.quantity)+'</li>').join('')+'</ul>'+action+'</article>';
  }).join("")||'<div class="panel">لا توجد طلبات لهذا المطعم حالياً.</div>';
 }
