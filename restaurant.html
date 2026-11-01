@@ -99,9 +99,9 @@ async function start(){
  document.getElementById("orders").innerHTML=os.map(o=>{
   const its=items.filter(i=>i.order_id===o.id);
   let action=o.status==="جديد"
-   ?'<button onclick="updateStatus(\\''+o.id+'\\',\\'قيد التحضير\\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\\''+o.id+'\\',\\'ملغي\\')">رفض الطلب</button>'
+   ?'<button onclick="updateStatus(\''+o.id+'\',\'قيد التحضير\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\''+o.id+'\',\'ملغي\')">رفض الطلب</button>'
    :o.status==="قيد التحضير"
-    ?'<button onclick="updateStatus(\\''+o.id+'\\',\\'جاهز للاستلام\\')">📦 الطلب جاهز — تسليمه للسائق</button>'
+    ?'<button onclick="updateStatus(\''+o.id+'\',\'جاهز للاستلام\')">📦 الطلب جاهز — تسليمه للسائق</button>'
     :o.status==="جاهز للاستلام"
      ?'<p style="color:#16834a;font-weight:700">✅ الطلب جاهز للاستلام — بانتظار السائق.</p>'
      :o.status==="بالطريق"
