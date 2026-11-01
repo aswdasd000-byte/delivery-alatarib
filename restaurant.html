@@ -119,7 +119,7 @@ document.getElementById("addStoreProductBtn").addEventListener("click",async()=>
   const image_url=imageFile?await uploadRestaurantImage(imageFile,"product","new"):null;await api("products",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({store_id:currentStoreId,name,category,price_syp:price,description,emoji,image_url,is_available:true})});
   ["storeProductName","storeProductPrice","storeProductDescription","storeProductCategory","storeProductImage"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("storeProductEmoji").value="🍔";
-  document.getElementById("storeProductImagePreview").classList.add("hidden");s.textContent="تمت إضافة المنتج مع صورته وحفظه بنجاح."await loadRestaurantProducts();
+  document.getElementById("storeProductImagePreview").classList.add("hidden");s.textContent="تمت إضافة المنتج مع صورته وحفظه بنجاح.";await loadRestaurantProducts();
  }catch(e){s.textContent="تعذر إضافة المنتج: "+(e.message||"خطأ");}finally{b.disabled=false;}
 });
 async function toggleRestaurantProduct(id,available){
