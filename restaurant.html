@@ -101,7 +101,9 @@ async function start(){
   let action=o.status==="جديد"
    ?'<button onclick="updateStatus(\''+o.id+'\',\'قيد التحضير\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\''+o.id+'\',\'ملغي\')">رفض الطلب</button>'
    :o.status==="قيد التحضير"
-    ?'<p style="color:#16834a;font-weight:700">الطلب مقبول وقيد التحضير — بانتظار استلام السائق.</p>'
+    ?'<button onclick="updateStatus(\''+o.id+\'\',\'جاهز للاستلام\')">📦 الطلب جاهز — تسليمه للسائق</button>'
+    :o.status==="جاهز للاستلام"
+    ?'<p style="color:#16834a;font-weight:700">✅ الطلب جاهز للاستلام — بانتظار السائق.</p>'
     :o.status==="بالطريق"
      ?'<p style="color:#1769aa;font-weight:700">🛵 السائق استلم الطلب وهو بالطريق للزبون.</p>'
      :o.status==="تم التسليم"
