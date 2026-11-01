@@ -67,17 +67,20 @@ main{padding:12px 12px 30px}
 .quick-categories{display:none}
 .all-stores-heading{margin-top:24px}
 #stores{display:grid;grid-template-columns:1fr;gap:18px}
-#stores .store-card{border-radius:22px;background:#202020;border:1px solid #363636}
-#stores .store-cover{height:185px;background:#292929}
-#stores .store-cover-placeholder{background:linear-gradient(135deg,#3c3028,#171717);font-size:82px}
-#stores .store-card-body{padding:13px;gap:11px}
-#stores .store-logo{width:58px;height:58px;flex-basis:58px;font-size:31px}
-#stores .store-name h3{font-size:19px}
-#stores .store-name .store-type{font-size:13px}
-#stores .store-desc{font-size:13px}
-#stores .store-meta{display:flex;flex-wrap:wrap;gap:7px}
-#stores .store-meta span{background:#4b3217;border:0;border-radius:10px;color:#ffb84f;font-size:12px;font-weight:750;padding:9px 10px}
-#stores .store-card button{display:block;width:100%;margin-top:10px;background:#ff7626;color:#fff;padding:12px;font-size:14px;font-weight:800;border-radius:12px}#stores .store-card button:disabled{background:#555;color:#ddd;cursor:not-allowed}
+/* Compact cards for the remaining restaurants and shops: 85% image, 15% title */
+#stores{gap:12px}
+#stores .store-card{height:25vh;min-height:0;max-height:25vh;border-radius:18px;background:#202020;border:1px solid #363636;overflow:hidden;cursor:pointer}
+#stores .store-cover{height:85%;min-height:0;flex:0 0 85%;width:100%;background:#292929;overflow:hidden}
+#stores .store-cover-photo{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+#stores .store-cover-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#3c3028,#171717);font-size:64px}
+#stores .store-card-body{height:15%;min-height:0;flex:0 0 15%;padding:0 10px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:0;overflow:hidden}
+#stores .store-identity{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}
+#stores .store-logo{display:none}
+#stores .store-name{flex:1;min-width:0;text-align:center}
+#stores .store-name h3{font-size:14px;line-height:1.2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stores .store-name .store-type{display:none}
+#stores .store-state{font-size:10px;padding:3px 6px}
+#stores .store-desc,#stores .store-meta,#stores .store-card button{display:none!important}
 #storeDetailView{padding-top:3px}
 #storeDetailView>#detailStoreName{display:none}
 #detailStoreHero{margin:0 0 18px}
@@ -385,7 +388,7 @@ function renderStores(){
  const term=customerSearchTerm.trim().toLocaleLowerCase("ar");
  const category=window.homeStoreCategory||"";
  const shown=stores.filter(s=>(activeStoreFilter==="all"||(activeStoreFilter==="restaurants"?isRestaurantStore(s):activeStoreFilter==="shops"?!isRestaurantStore(s):true))&&(!category||homeCategoryMatches(s,category))&&(!term||[s.name,s.desc,s.type].some(v=>String(v||"").toLocaleLowerCase("ar").includes(term))));
- const card=s=>'<article class="card store-card"><div class="store-cover">'+(storePhoto(s.coverImage,s.name,"store-cover-photo")||'<div class="store-cover-placeholder" aria-hidden="true">'+escapeHtml(s.emoji||"🏬")+'</div>')+'</div><div class="store-card-body"><div class="store-identity"><div class="store-logo">'+(storePhoto(s.logoImage,s.name,"store-logo-photo")||escapeHtml(s.emoji||"🏬"))+'</div><div class="store-name"><h3>'+s.name+'</h3><span class="store-type">'+(s.type||"متجر")+'</span></div><span class="store-state '+(s.isOpen?"":"closed")+'">'+(s.isOpen?"مفتوح":"مغلق")+'</span></div>'+(s.desc?'<p class="store-desc">'+s.desc+'</p>':'')+'<div class="store-meta"><span>🚚 التوصيل: 200 ل.س</span><span>⏱️ التحضير: 15 دقيقة</span></div><button class="primary small" '+(s.isOpen?"":"disabled")+' onclick="openStore('+s.id+')">'+(s.isOpen?"عرض المنتجات":"المطعم مغلق")+'</button></div></article>';
+ const card=s=>'<article class="card store-card" '+(s.isOpen?'onclick="openStore('+s.id+')"':'')+'><div class="store-cover">'+(storePhoto(s.coverImage,s.name,"store-cover-photo")||'<div class="store-cover-placeholder" aria-hidden="true">'+escapeHtml(s.emoji||"🏬")+'</div>')+'</div><div class="store-card-body"><div class="store-identity"><div class="store-logo">'+(storePhoto(s.logoImage,s.name,"store-logo-photo")||escapeHtml(s.emoji||"🏬"))+'</div><div class="store-name"><h3>'+s.name+'</h3><span class="store-type">'+(s.type||"متجر")+'</span></div><span class="store-state '+(s.isOpen?"":"closed")+'">'+(s.isOpen?"مفتوح":"مغلق")+'</span></div>'+(s.desc?'<p class="store-desc">'+s.desc+'</p>':'')+'<div class="store-meta"><span>🚚 التوصيل: 200 ل.س</span><span>⏱️ التحضير: 15 دقيقة</span></div><button class="primary small" '+(s.isOpen?"":"disabled")+' onclick="openStore('+s.id+')">'+(s.isOpen?"عرض المنتجات":"المطعم مغلق")+'</button></div></article>';
  document.getElementById("stores").innerHTML=shown.length?shown.map(card).join(""):'<div class="panel empty">ما لقينا نتائج بهالتصنيف.</div>';
  const discovery=document.getElementById("homeDiscovery");
  const showHome=activeStoreFilter==="all"&&!term&&!category;
