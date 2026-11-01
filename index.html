@@ -110,18 +110,45 @@ body:has(#ordersView:not(.hidden)) header{display:none}.discovery-section .mini-
 
 html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:pan-y}#storeDetailView,#storeDetailHero{width:100%;max-width:100%;min-width:0;overflow-x:hidden}#storeDetailHero .detail-cover{display:block!important;width:100%!important;height:clamp(105px,28vw,150px)!important;min-height:105px!important;max-height:150px!important;aspect-ratio:16/5!important;overflow:hidden!important;position:relative!important}#storeDetailHero .detail-cover-photo{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;transform:none!important}#storeDetailHero .detail-logo{display:block!important;position:relative!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;max-width:48px!important;max-height:48px!important;flex:0 0 48px!important;overflow:hidden!important;border-radius:50%!important}#storeDetailHero .detail-logo-photo{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;border-radius:50%!important}
 
-/* مقاسات صغيرة وثابتة لغلاف المطعم وشعاره داخل صفحة المنتجات */
-#storeDetailView{overflow-x:hidden!important}
-#storeDetailHero{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
-#storeDetailHero .detail-topline{margin:0 2px 4px!important}
-#storeDetailHero .detail-topline h2{font-size:18px!important}
-#storeDetailHero .detail-cover{width:100%!important;height:88px!important;min-height:88px!important;max-height:88px!important;aspect-ratio:auto!important;flex:none!important;border-radius:12px!important;overflow:hidden!important;position:relative!important}
-#storeDetailHero .detail-cover-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;object-position:center!important}
-#storeDetailHero .detail-identity{display:flex!important;flex-direction:row!important;align-items:center!important;gap:9px!important;margin:0 3px!important;min-height:42px!important}
-#storeDetailHero .detail-logo{position:relative!important;display:block!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;max-width:38px!important;max-height:38px!important;flex:0 0 38px!important;border-radius:50%!important;overflow:hidden!important}
-#storeDetailHero .detail-logo-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;border-radius:50%!important}
-#storeDetailHero .detail-name{font-size:13px!important;line-height:1.4!important}
-#storeDetailHero .detail-meta{margin:0 2px 5px!important}
+/* تثبيت صور المطعم حصراً داخل رأس صفحة عرض المنتجات */
+#storeDetailView #storeDetailHero{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow:hidden!important;gap:8px!important;transform:none!important;
+}
+#storeDetailView #storeDetailHero .detail-cover{
+  display:block!important;position:relative!important;box-sizing:border-box!important;
+  width:100%!important;height:88px!important;min-height:88px!important;max-height:88px!important;
+  aspect-ratio:auto!important;flex:0 0 88px!important;overflow:hidden!important;
+  border-radius:12px!important;font-size:0!important;line-height:0!important;
+}
+#storeDetailView #storeDetailHero .detail-cover img,
+#storeDetailView #storeDetailHero img.detail-cover-photo{
+  display:block!important;position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:100%!important;max-height:100%!important;object-fit:cover!important;
+  object-position:center!important;margin:0!important;padding:0!important;
+  transform:none!important;pointer-events:none!important;
+}
+#storeDetailView #storeDetailHero .detail-identity{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  gap:9px!important;width:100%!important;min-height:38px!important;
+  margin:0 3px!important;overflow:hidden!important;
+}
+#storeDetailView #storeDetailHero .detail-logo{
+  display:block!important;position:relative!important;box-sizing:border-box!important;
+  width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+  max-width:38px!important;max-height:38px!important;flex:0 0 38px!important;
+  border-radius:50%!important;overflow:hidden!important;
+}
+#storeDetailView #storeDetailHero .detail-logo img,
+#storeDetailView #storeDetailHero img.detail-logo-photo{
+  display:block!important;position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:100%!important;max-height:100%!important;object-fit:cover!important;
+  border-radius:50%!important;margin:0!important;padding:0!important;transform:none!important;
+}
+#storeDetailView #storeDetailHero .detail-name{min-width:0!important;overflow:hidden!important}
 </style> <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#1d1d1d">
 <link rel="apple-touch-icon" href="./icon-192.png">
