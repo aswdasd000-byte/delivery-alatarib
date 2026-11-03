@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171717"><meta name="description" content="بوابة موظفي ديليفري الأتارب">
+<link rel="manifest" href="./staff-manifest.json"><link rel="icon" href="./icon-192.png"><link rel="apple-touch-icon" href="./icon-192.png">
+<title>بوابة الموظفين | ديليفري الأتارب</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:#171717;color:#f7f7f7}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at top,#263b83 0,#171717 48%)}
+main{width:min(100%,440px);background:#222;border:1px solid #414141;border-radius:22px;padding:22px;box-shadow:0 15px 45px #0007}
+.logo{width:70px;height:70px;object-fit:cover;border-radius:18px;display:block;margin:0 auto 12px}
+h1{text-align:center;font-size:22px;margin:0 0 5px}p{text-align:center;color:#bbb;font-size:13px;line-height:1.7;margin:0 0 22px}
+label{display:block;font-size:14px;font-weight:700;margin:12px 0 6px}
+input{width:100%;padding:14px;border:1px solid #555;background:#303030;color:#fff;border-radius:12px;font:inherit}
+button{width:100%;padding:14px;margin-top:18px;border:0;border-radius:12px;background:#ff7626;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+button:disabled{opacity:.6}.message{min-height:44px;margin:13px 0 0;color:#ffcc9f;text-align:center;white-space:pre-wrap}
+.back{display:block;text-align:center;color:#aaa;margin-top:15px;font-size:13px;text-decoration:none}
+.badge{display:inline-block;background:#303030;border:1px solid #454545;padding:7px 12px;border-radius:20px;color:#ddd;font-size:12px;margin:0 auto 18px}
+</style></head><body><main>
+<img class="logo" src="./icon-192.png" alt="شعار ديليفري الأتارب">
+<h1>بوابة موظفي ديليفري الأتارب</h1><p>سجّل الدخول بحساب العمل، وسيتم توجيهك تلقائياً إلى لوحتك حسب الصلاحية الممنوحة من المدير.</p>
+<form id="loginForm"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required>
+<label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required>
+<button id="loginBtn" type="submit">تسجيل الدخول</button></form>
+<div id="message" class="message" role="status" aria-live="polite"></div>
+<a class="back" href="./">العودة إلى واجهة الزبون</a>
+</main>
+<script>
+const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
+const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
+const msg=document.getElementById("message"),btn=document.getElementById("loginBtn");
+async function request(path,options={}){const response=await fetch(SUPABASE_URL+path,{...options,headers:{apikey:SUPABASE_KEY,Authorization:options.token?"Bearer "+options.token:undefined,"Content-Type":"application/json",...(options.headers||{})}});const body=await response.text();let data={};try{data=body?JSON.parse(body):{}}catch{}if(!response.ok)throw Error(data.msg||data.message||data.error_description||data.details||"تعذر التحقق من الحساب ("+response.status+")");return data;}
+async function verifyMembership(table,userId,token,extra=""){const rows=await request("/rest/v1/"+table+"?select=active,user_id&user_id=eq."+encodeURIComponent(userId)+(extra?"&"+extra:""),{token});return rows.some(row=>row.active===true);}
+function saveCookie(name,value){document.cookie=name+"="+encodeURIComponent(value)+"; Max-Age="+(30*86400)+"; Path=/; SameSite=Lax; Secure";}
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+ event.preventDefault();btn.disabled=true;btn.textContent="جارٍ التحقق...";msg.textContent="نتحقق من الحساب والصلاحيات...";
+ try{
+  const session=await request("/auth/v1/token?grant_type=password",{method:"POST",body:JSON.stringify({email:document.getElementById("email").value.trim(),password:document.getElementById("password").value})});
+  const role=String(session.user?.app_metadata?.role||"").toLowerCase().trim();
+  let destination="",sessionKey="";
+  if(role==="admin"){destination="./admin.html";sessionKey="delivery_admin_session_v1";saveCookie("delivery_admin_refresh",session.refresh_token);}
+  else if(role==="store"){
+   const rows=await request("/rest/v1/store_staff?select=store_id,user_id&user_id=eq."+encodeURIComponent(session.user.id),{token:session.access_token});
+   if(!rows.length)throw Error("هذا الحساب غير مرتبط بأي مطعم. راجع المدير لتفعيل صلاحيتك.");
+   destination="./restaurant.html";sessionKey="delivery_restaurant_session_v1";
+  }else if(role==="driver"){
+   const active=await verifyMembership("delivery_staff",session.user.id,session.access_token);
+   if(!active)throw Error("حساب السائق غير مفعّل حالياً. راجع المدير.");
+   destination="./driver.html";sessionKey="delivery_driver_session_v1";
+  }else{
+   throw Error("هذا الحساب حساب زبون أو لا يملك صلاحية عمل. لا يمكنه فتح لوحات الإدارة أو الموظفين.");
+  }
+  localStorage.setItem(sessionKey,JSON.stringify(session));
+  msg.textContent="تم التحقق من الصلاحية. جارٍ فتح لوحتك...";
+  location.replace(destination);
+ }catch(error){msg.textContent=error.message||"تعذر تسجيل الدخول.";}
+ finally{btn.disabled=false;btn.textContent="تسجيل الدخول";}
+});
+if("serviceWorker"in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));}
+</script></body></html>
