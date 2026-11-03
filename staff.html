@@ -29,7 +29,7 @@ button:disabled{opacity:.6}.message{min-height:44px;margin:13px 0 0;color:#ffcc9
 const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
 const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
 const msg=document.getElementById("message"),btn=document.getElementById("loginBtn");
-async function request(path,options={}){const response=await fetch(SUPABASE_URL+path,{...options,headers:{apikey:SUPABASE_KEY,Authorization:options.token?"Bearer "+options.token:undefined,"Content-Type":"application/json",...(options.headers||{})}});const body=await response.text();let data={};try{data=body?JSON.parse(body):{}}catch{}if(!response.ok)throw Error(data.msg||data.message||data.error_description||data.details||"تعذر التحقق من الحساب ("+response.status+")");return data;}
+async function request(path,options={}){const headers={apikey:SUPABASE_KEY,"Content-Type":"application/json",...(options.headers||{})};if(options.token)headers.Authorization="Bearer "+options.token;const response=await fetch(SUPABASE_URL+path,{...options,headers});const body=await response.text();let data={};try{data=body?JSON.parse(body):{}}catch{}if(!response.ok)throw Error(data.msg||data.message||data.error_description||data.details||"تعذر التحقق من الحساب ("+response.status+")");return data;}
 async function verifyMembership(table,userId,token,extra=""){const rows=await request("/rest/v1/"+table+"?select=active,user_id&user_id=eq."+encodeURIComponent(userId)+(extra?"&"+extra:""),{token});return rows.some(row=>row.active===true);}
 function saveCookie(name,value){document.cookie=name+"="+encodeURIComponent(value)+"; Max-Age="+(30*86400)+"; Path=/; SameSite=Lax; Secure";}
 document.getElementById("loginForm").addEventListener("submit",async event=>{
