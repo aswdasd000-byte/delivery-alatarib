@@ -244,6 +244,51 @@ html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:pan-y}#storeD
 .discovery-section .mini-store-meta{display:flex!important;gap:7px!important}
 .discovery-section .mini-store-meta span{font-size:11px!important;padding:7px 9px!important}
 .discovery-section .mini-store-open{display:none!important}
+
+/* Professional visual refresh - Delivery Al Atarib */
+:root{--brand:#ff7626;--brand-soft:#ff9a55;--bg:#141414;--ink:#f7f7f7;--muted:#b8b8b8;--card:#222;--line:#383838}
+body{background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(110deg,#21170f,#382316 55%,#21170f)!important;border-bottom:1px solid #684126;box-shadow:0 4px 18px #0007}
+.header-top{min-height:48px}
+.location-chip{background:#2a211b;border:1px solid #654126;color:#fff}
+.intro{background:linear-gradient(125deg,#4b2815,#9b4b1c 58%,#d86a25)!important;border:1px solid #a95828;box-shadow:0 8px 24px #0004}
+.intro h2{font-size:22px!important;font-weight:900}
+.store-filter-tabs button{border-radius:24px!important;background:#252525!important;border:1px solid #414141!important}
+.store-filter-tabs button.active{background:var(--brand)!important;color:#fff!important;border-color:var(--brand)!important}
+.discovery-section h3,.all-stores-heading,.tabs-title{font-size:20px!important;font-weight:900!important}
+#stores .store-cover{box-shadow:0 5px 18px #0006}
+#stores .store-card{transition:transform .16s ease}
+#stores .store-card:active,.mini-store-card:active{transform:scale(.985)}
+#stores .store-name h3{color:#fff}
+#stores .store-meta span{border:1px solid #67401f!important}
+#storeDetailView .detail-topline h2{font-weight:900}
+#detailStoreHero .detail-cover{box-shadow:0 8px 22px #0007}
+#storeDetailProducts .card{background:linear-gradient(145deg,#292929,#202020)!important;border:1px solid #414141!important;box-shadow:0 4px 13px #0004}
+#storeDetailProducts .card .price{color:#ffb35e!important}
+#productDetailPage{overflow:hidden;background:#222!important;border:1px solid #414141;box-shadow:0 8px 24px #0005}
+#cartView .delivery-choice{border-color:#754321}
+#cartView .delivery-choice.active{background:linear-gradient(120deg,#e9651c,#ff8a38)!important}
+#cartView #customDeliveryForm,#cartView #basketCheckoutPanel{background:#222!important;border-color:#414141!important;box-shadow:0 4px 15px #0004}
+#cartView .delivery-intro{background:linear-gradient(120deg,#29211b,#242424)!important;border-color:#654126!important}
+#cartItems .item{background:#242424;border:1px solid #3c3c3c;border-radius:14px;padding:12px;margin:8px 0}
+#cartItems p{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #393939;padding:8px 2px;margin:0}
+#cartItems p:last-of-type{font-size:17px;color:#ffbd7a;border:0}
+.primary,#storeCartBar{background:linear-gradient(110deg,#e9651c,#ff8735)!important;color:#fff!important;font-weight:850;box-shadow:0 4px 12px #0003}
+button:focus-visible,a:focus-visible{outline:2px solid #ffb36b;outline-offset:2px}
+nav{background:#1e1e1e!important;border-top:1px solid #454545!important;box-shadow:0 -5px 18px #0005}
+nav button.active{color:#ff8735!important}
+nav button[data-view="cart"] span{background:#e9651c}
+#ordersView .order-card{background:linear-gradient(145deg,#292929,#202020)!important;border-color:#414141!important}
+#ordersView .order-number>b,#ordersView .orders-page-title span{color:#ff8735!important}
+#ordersView .orders-filters button.active{background:#e9651c!important;border-color:#e9651c!important}
+#ordersView .order-card .order-status{font-weight:800}
+@media(max-width:420px){
+ main{padding-left:13px;padding-right:13px}
+ #stores .store-cover{border-radius:17px!important}
+ #stores .store-name h3{font-size:17px!important}
+ #stores .store-logo{width:54px!important;height:54px!important;flex-basis:54px!important}
+ #stores .store-meta span{font-size:11px!important;padding:7px 8px!important}
+}
 </style>
 <div class="delivery-choice-row" aria-label="اختيار نوع التوصيل">
 <button type="button" class="delivery-choice" id="chooseCustomDelivery">🚚 توصيـلة خاصة إلك</button>
