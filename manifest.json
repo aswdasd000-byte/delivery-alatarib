@@ -1,27 +1,26 @@
 {
-"name": "ديليفري الأتارب",
-"short_name": "ديليفري الأتارب",
-"description": "تطبيق توصيل المطاعم والمتاجر في الأتارب",
-"lang": "ar",
-"dir": "rtl",
-"start_url": "./",
-"scope": "./",
-"display": "standalone",
-"orientation": "portrait",
-"prefer_related_applications": false,
-"categories": ["food", "shopping"],
-"background_color": "#171717",
-"theme_color": "#4165df",
-"icons": [
-{
-"src": "./icon-192.png",
-"sizes": "192x192",
-"type": "image/png"
-},
-{
-"src": "./icon-512.png",
-"sizes": "512x512",
-"type": "image/png"
-}
-]
+  "name": "ديليفري الأتارب",
+  "short_name": "ديليفري الأتارب",
+  "description": "تطبيق توصيل المطاعم والمتاجر في الأتارب",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "categories": [
+    "food",
+    "shopping"
+  ],
+  "background_color": "#171717",
+  "theme_color": "#ff7626",
+  "icons": [
+    {
+      "src": "./logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
