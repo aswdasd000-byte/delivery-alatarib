@@ -687,5 +687,20 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+
+<script>
+(()=> {
+ const ANALYTICS_URL="https://apreejawamptetdflwcf.supabase.co";
+ const ANALYTICS_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
+ let visitorId="";
+ try{visitorId=localStorage.getItem("delivery_analytics_visitor_v1")||"";if(!visitorId){visitorId=crypto.randomUUID();localStorage.setItem("delivery_analytics_visitor_v1",visitorId);}}catch(e){visitorId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random());}
+ async function record(type){
+  try{await fetch(ANALYTICS_URL+"/rest/v1/app_analytics_events",{method:"POST",headers:{apikey:ANALYTICS_KEY,Authorization:"Bearer "+ANALYTICS_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({visitor_id:visitorId,event_type:type,page_path:location.pathname}),keepalive:true});}catch(e){console.debug("Analytics event skipped",e);}
+ }
+ let firstVisit=false;try{firstVisit=!sessionStorage.getItem("delivery_analytics_session_v1");if(firstVisit)sessionStorage.setItem("delivery_analytics_session_v1","1");}catch(e){firstVisit=true;}
+ if(firstVisit){record("page_view");if((window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true)record("standalone_open");}
+ window.addEventListener("appinstalled",()=>record("install"));
+})();
+</script>
 </body>
 </html>
