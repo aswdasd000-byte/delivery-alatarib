@@ -8,8 +8,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "ديليفري الأتارب";
   const options = {
     body: data.body || "عندك تحديث جديد",
-    icon: "./icon-192.png",
-    badge: "./icon-192.png",
+    icon: "./icon-192.png?v=20261103b",
+    badge: "./icon-192.png?v=20261103b",
     data: { url: data.url || "./", orderNumber: data.orderNumber || null },
     tag: data.tag || "delivery-update",
     renotify: true
