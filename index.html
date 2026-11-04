@@ -467,7 +467,8 @@ async function loadCatalog(){
  try{
   const [ss,pp,fees]=await Promise.all([api("stores?select=id,name,category,description,emoji,is_active,accepts_orders,cover_image_url,logo_url,delivery_fee_syp,prep_time_minutes&order=id"),api("products?select=id,store_id,name,description,category,price_syp,emoji,image_url&is_available=eq.true&order=id"),api("delivery_finance_settings?select=inside_fee_syp,outside_fee_syp&id=eq.true")]);
   if(fees?.[0]){deliveryFinanceFees.inside=Number(fees[0].inside_fee_syp??150);deliveryFinanceFees.outside=Number(fees[0].outside_fee_syp??250);}
-  stores=ss.map(s=>({id:s.id,name:s.name,type:s.category,desc:s.description,emoji:s.emoji,coverImage:s.cover_image_url||"",logoImage:s.logo_url||"",deliveryFee:Number(s.delivery_fee_syp??200),prepMinutes:Number(s.prep_time_minutes??15),isOpen:s.is_active!==false&&s.accepts_orders!==false}));
+  const zoneSelect=document.querySelector("#checkout [name=deliveryZone]");if(zoneSelect?.options?.length>=2){zoneSelect.options[0].textContent="داخل الأتارب — "+money(deliveryFinanceFees.inside)+" ل.س";zoneSelect.options[1].textContent="خارج الأتارب — "+money(deliveryFinanceFees.outside)+" ل.س";}
+  stores=ss.map(s=>({id:s.id,name:s.name,type:s.category,desc:s.description,emoji:s.emoji,coverImage:s.cover_image_url||"",logoImage:s.logo_url||"",deliveryFee:deliveryFinanceFees.inside,prepMinutes:Number(s.prep_time_minutes??15),isOpen:s.is_active!==false&&s.accepts_orders!==false}));
   products=pp.map(p=>({id:p.id,store:p.store_id,name:p.name,desc:p.description||"",category:p.category||"عام",price:Number(p.price_syp),emoji:p.emoji,image_url:p.image_url||""}));
   renderStores();renderCart();updateStoreCartBar();refreshCustomStoreOptions();loadCustomerPromotions();
  }catch(err){
