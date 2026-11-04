@@ -622,7 +622,32 @@ document.getElementById("contactUsBtn").addEventListener("click",()=>{window.loc
 document.getElementById("contactWhatsAppBtn").addEventListener("click",()=>{window.open("https://wa.me/963988463483","_blank");});
 document.getElementById("rateAppBtn").addEventListener("click",()=>alert("شكراً لدعمك ❤️ رابط تقييم التطبيق سيُضاف بعد نشره على المتجر."));
 document.getElementById("customerLogoutBtn").addEventListener("click",async()=>{try{if(customerSession?.access_token)await adminAuth("logout",{method:"POST",headers:{Authorization:"Bearer "+customerSession.access_token}});}catch{}customerSession=null;customerAddresses=[];customerAvatarUrl="";if(String(localStorage.getItem("ata_profile_photo")||"").startsWith(SUPABASE_URL+"/storage/"))localStorage.removeItem("ata_profile_photo");savedBaskets=JSON.parse(localStorage.getItem("ata_saved_baskets")||"[]");orders=JSON.parse(localStorage.getItem("ata_orders")||"[]");localStorage.removeItem("ata_customer_session");renderCustomerProfile();renderSavedAddresses();renderOrders();customerMessage("تم تسجيل الخروج.");});
-async function restoreCustomerSession(){try{const saved=localStorage.getItem("ata_customer_session");if(saved){customerSession=JSON.parse(saved);if(customerSession?.access_token){const expiresAt=Number(customerSession.expires_at||0);if(expiresAt&&expiresAt*1000<Date.now()+60000&&customerSession.refresh_token){try{const refreshed=await adminAuth("token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:customerSession.refresh_token})});customerSession=refreshed;localStorage.setItem("ata_customer_session",JSON.stringify(customerSession));}catch(err){console.warn("تعذر تجديد جلسة الزبون تلقائياً",err);if(expiresAt*1000<Date.now()){customerSession=null;localStorage.removeItem("ata_customer_session");}}}if(customerSession?.access_token){renderCustomerProfile();await syncCustomerData();return;}}}}catch(err){console.warn("تعذر استعادة جلسة الزبون",err);}customerSession=null;renderCustomerProfile();}
+async function restoreCustomerSession(){
+ const saved=localStorage.getItem("ata_customer_session");
+ if(!saved){customerSession=null;renderCustomerProfile();return;}
+ try{
+  const stored=JSON.parse(saved);
+  if(!stored?.access_token||!stored?.user)throw new Error("بيانات جلسة الحساب غير مكتملة");
+  customerSession=stored;
+  const expiresAt=Number(customerSession.expires_at||0);
+  if((!expiresAt||expiresAt*1000<Date.now()+120000)&&customerSession.refresh_token){
+   try{
+    const refreshed=await adminAuth("token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:customerSession.refresh_token})});
+    if(refreshed?.access_token&&refreshed?.user){customerSession=refreshed;localStorage.setItem("ata_customer_session",JSON.stringify(customerSession));}
+   }catch(err){
+    console.warn("تعذر تجديد جلسة الزبون تلقائياً",err);
+    if(expiresAt&&expiresAt*1000<Date.now()){customerSession=null;localStorage.removeItem("ata_customer_session");renderCustomerProfile();customerMessage("انتهت جلسة الحساب، سجّل الدخول من جديد.");return;}
+   }
+  }
+  if(!customerSession?.access_token){customerSession=null;renderCustomerProfile();return;}
+  renderCustomerProfile();
+  try{await syncCustomerData();}
+  catch(err){console.warn("تعذر مزامنة بيانات الزبون بعد استعادة الجلسة؛ بقي الحساب مسجلاً",err);customerMessage("تم استعادة دخولك، لكن تعذرت مزامنة بعض البيانات. حاول تحديث الصفحة لاحقاً.");}
+ }catch(err){
+  console.warn("تعذر قراءة جلسة الزبون المحفوظة",err);
+  customerSession=null;localStorage.removeItem("ata_customer_session");renderCustomerProfile();
+ }
+}
 let adminSession=null;
 let knownOrderIds=new Set();
 let orderPollTimer=null;
