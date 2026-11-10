@@ -280,7 +280,7 @@ async function start(){
  const items=await api("order_items?select=order_id,product_name,quantity,product_id&product_id=in.("+ids.join(",")+")");
  const oids=[...new Set(items.map(i=>i.order_id))];
  if(!oids.length){document.getElementById("orders").innerHTML='<div class="panel">لا توجد طلبات لهذا المطعم حالياً.</div>';return;}
- const os=await api("orders?select=id,order_number,customer_name,customer_phone,delivery_address,status,created_at,assigned_driver_id&id=in.("+oids.join(",")+")&order=created_at.desc");
+ const os=await api("orders?select=id,order_number,customer_name,customer_phone,delivery_address,status,created_at,assigned_driver_id,scheduled_for&id=in.("+oids.join(",")+")&order=created_at.desc");
  const ordersHtml=os.map(o=>{
   const its=items.filter(i=>i.order_id===o.id);
   let action=o.status==="جديد"
@@ -294,7 +294,7 @@ async function start(){
       :o.status==="تم التسليم"
        ?'<p style="color:#16834a;font-weight:700">✅ تم تسليم الطلب للزبون.</p>'
        :'<p style="color:#a72b2b;font-weight:700">تم إلغاء الطلب.</p>';
-  return '<article class="panel"><div class="row"><b>طلب #'+esc(o.order_number)+'</b><b>'+esc(o.status)+'</b></div><p><b>الزبون:</b> '+esc(o.customer_name)+' • '+esc(o.customer_phone)+'</p><p><b>العنوان:</b> '+esc(o.delivery_address)+'</p><ul>'+its.map(i=>'<li>'+esc(i.product_name)+' × '+esc(i.quantity)+'</li>').join('')+'</ul>'+action+'</article>';
+  return '<article class="panel"><div class="row"><b>طلب #'+esc(o.order_number)+'</b><b>'+esc(o.status)+'</b></div><p><b>الزبون:</b> '+esc(o.customer_name)+' • '+esc(o.customer_phone)+'</p><p><b>العنوان:</b> '+esc(o.delivery_address)+'</p>'+(o.scheduled_for?'<p style="background:#fff2d9;padding:9px;border-radius:9px;color:#704b13"><b>🗓️ موعد وصول الزبون:</b> '+esc(new Date(o.scheduled_for).toLocaleString("ar"))+'</p>':"")+'<ul>'+its.map(i=>'<li>'+esc(i.product_name)+' × '+esc(i.quantity)+'</li>').join('')+'</ul>'+action+'</article>';
  }).join("")||'<div class="panel">لا توجد طلبات لهذا المطعم حالياً.</div>';const ordersBox=document.getElementById("orders");if(ordersBox.innerHTML!==ordersHtml)ordersBox.innerHTML=ordersHtml;
 }
 window.addEventListener("DOMContentLoaded",async()=>{try{const saved=localStorage.getItem(SESSION_KEY);if(!saved)return;session=JSON.parse(saved);if(!session?.refresh_token){clearSession();return}if(session.expires_at&&Date.now()/1000>session.expires_at-60)await refreshSession();const role=String(session.user?.app_metadata?.role||"").toLowerCase().trim();isAdmin=role==="admin";if(!isAdmin&&role!=="store"){document.getElementById("message").textContent="الجلسة محفوظة لكن صلاحية الحساب الحالية ("+(role||"غير محددة")+") لا تسمح بدخول لوحة المطعم.";clearSession();return}showApp();await start();await restoreStorePush()}catch(e){document.getElementById("orders").innerHTML='<div class="panel">تعذر تحديث الجلسة أو تحميل الطلبات. جرّب تسجيل الدخول من جديد إذا استمرت المشكلة.</div>';if(!session?.refresh_token)clearSession()}});function toggleProfile(){const p=document.getElementById("profilePanel");p.classList.toggle("hidden");if(!p.classList.contains("hidden"))p.scrollIntoView({behavior:"smooth",block:"start"});}
