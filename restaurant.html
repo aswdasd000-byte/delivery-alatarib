@@ -98,6 +98,8 @@ hr{border-color:#34445b!important}
 <label>حالة استقبال الطلبات</label><select id="settingAcceptsOrders"><option value="true">مفتوح لاستقبال الطلبات</option><option value="false">مغلق مؤقتاً</option></select>
 <label>وقت التحضير بالدقائق</label><input id="settingPrepTime" type="number" min="1" max="240" step="1" placeholder="15">
 <label>الحد الأدنى للطلب (ل.س)</label><input id="settingMinOrder" type="number" min="0" step="1" placeholder="0 يعني بدون حد أدنى">
+<label style="display:flex;align-items:center;gap:9px;margin-top:14px"><input id="settingFreeDeliveryEnabled" type="checkbox" style="width:20px;height:20px"> 🚚 تفعيل التوصيل المجاني</label>
+<label>الحد الأدنى للطلب للحصول على توصيل مجاني (ل.س)</label><input id="settingFreeDeliveryMin" type="number" min="0" step="1" value="1000" placeholder="1000">
 <label>رقم هاتف المطعم / واتساب</label><input id="settingPhone" type="tel" maxlength="30" placeholder="رقم التواصل">
 <label>أوقات الدوام</label><input id="settingHours" maxlength="160" placeholder="مثلاً: يومياً من 9 صباحاً حتى 11 مساءً">
 <label>وصف المطعم</label><input id="settingDescription" maxlength="250" placeholder="نبذة مختصرة عن المطعم">
@@ -183,12 +185,14 @@ function updateClosingAlert(rawSchedule){
 setInterval(()=>{if(!currentStoreId||!session?.access_token)return;api("stores?select=opening_hours&id=eq."+encodeURIComponent(currentStoreId)).then(rows=>updateClosingAlert(rows[0]?.opening_hours)).catch(()=>{});},60000);
 async function loadRestaurantSettings(){
  if(!currentStoreId)return;
- const rows=await api("stores?select=name,description,prep_time_minutes,accepts_orders,min_order_syp,contact_phone,opening_hours,auto_accept_orders&id=eq."+encodeURIComponent(currentStoreId));
+ const rows=await api("stores?select=name,description,prep_time_minutes,accepts_orders,min_order_syp,contact_phone,opening_hours,auto_accept_orders,free_delivery_enabled,free_delivery_min_subtotal_syp&id=eq."+encodeURIComponent(currentStoreId));
  const st=rows[0];if(!st)return;
   updateClosingAlert(st.opening_hours);
  document.getElementById("settingAcceptsOrders").value=String(st.accepts_orders!==false);
  document.getElementById("settingPrepTime").value=st.prep_time_minutes??15;
  document.getElementById("settingMinOrder").value=st.min_order_syp??0;
+ document.getElementById("settingFreeDeliveryEnabled").checked=st.free_delivery_enabled===true;
+ document.getElementById("settingFreeDeliveryMin").value=st.free_delivery_min_subtotal_syp??1000;
  document.getElementById("settingPhone").value=st.contact_phone||"";
  document.getElementById("settingHours").value=st.opening_hours||"";
  document.getElementById("settingDescription").value=st.description||"";
@@ -197,11 +201,12 @@ document.getElementById("saveRestaurantSettingsBtn").addEventListener("click",as
  const b=document.getElementById("saveRestaurantSettingsBtn"),s=document.getElementById("restaurantSettingsStatus");b.disabled=true;s.textContent="جارٍ حفظ الإعدادات...";
  try{
   if(!currentStoreId)throw Error("لم يتم تحديد المطعم.");
-  const prep=Number(document.getElementById("settingPrepTime").value),minimum=Number(document.getElementById("settingMinOrder").value);
+  const prep=Number(document.getElementById("settingPrepTime").value),minimum=Number(document.getElementById("settingMinOrder").value),freeMinimum=Number(document.getElementById("settingFreeDeliveryMin").value);
   if(!Number.isInteger(prep)||prep<1||prep>240)throw Error("وقت التحضير يجب أن يكون بين 1 و240 دقيقة.");
   if(!Number.isSafeInteger(minimum)||minimum<0)throw Error("الحد الأدنى للطلب يجب أن يكون صفراً أو أكثر.");
+  if(!Number.isSafeInteger(freeMinimum)||freeMinimum<0)throw Error("حد التوصيل المجاني يجب أن يكون صفراً أو أكثر.");
   const phone=document.getElementById("settingPhone").value.trim(),hours=document.getElementById("settingHours").value.trim(),description=document.getElementById("settingDescription").value.trim();
-  const patch={accepts_orders:document.getElementById("settingAcceptsOrders").value==="true",prep_time_minutes:prep,min_order_syp:minimum,contact_phone:phone,opening_hours:hours,description};
+  const patch={accepts_orders:document.getElementById("settingAcceptsOrders").value==="true",prep_time_minutes:prep,min_order_syp:minimum,free_delivery_enabled:document.getElementById("settingFreeDeliveryEnabled").checked,free_delivery_min_subtotal_syp:freeMinimum,contact_phone:phone,opening_hours:hours,description};
   await api("stores?id=eq."+encodeURIComponent(currentStoreId),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify(patch)});
   s.textContent="✅ تم حفظ إعدادات المطعم.";
  }catch(e){s.textContent="تعذر الحفظ: "+(e.message||"خطأ");}finally{b.disabled=false;}
