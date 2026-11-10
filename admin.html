@@ -71,6 +71,7 @@ label{display:block;font-size:13px;color:#ddd;font-weight:700}
 .dashboard-bottom-nav span{font-size:13px}
 a{color:#8da8ff}
 @media(max-width:600px){main{padding:12px 11px 24px}#profilePanel .profile-fields{grid-template-columns:1fr}.panel{padding:14px}.brand-title h1{font-size:15px}.header-link{padding:8px;font-size:11px}#orders>.tabs{top:62px}}
+.store-hours-editor{margin:14px 0;padding:12px;border:1px solid #c7a45b66;border-radius:13px;background:#101b2d}.store-hours-editor>b{display:block;margin-bottom:6px}.store-hours-row{display:grid;grid-template-columns:1.1fr 1fr auto 1fr;align-items:center;gap:7px;padding:4px 0}.store-hours-row label{display:flex;align-items:center;gap:6px}.store-hours-row input[type=checkbox]{width:18px;min-height:18px;margin:0}.store-hours-row input[type=time]{margin:0;min-height:38px;padding:6px}.store-hours-row span{font-size:12px;color:#c2c9d2}@media(max-width:420px){.store-hours-row{grid-template-columns:1fr 1fr auto 1fr;gap:4px}.store-hours-row label{font-size:11px}}
 </style>
 
 <style id="premium-dashboard-theme">
@@ -212,16 +213,34 @@ async function deactivatePromotion(id){
 }
 document.getElementById("refreshPromotions")?.addEventListener("click",loadPromotions);
 async function loadPromoProducts(){const sel=document.getElementById("promoProduct");if(!sel)return;try{const [ps,ss]=await Promise.all([api("products?select=id,name,store_id&is_available=eq.true&order=name"),api("stores?select=id,name&order=name")]);const names=new Map(ss.map(x=>[String(x.id),x.name]));sel.innerHTML='<option value="">عرض عام بدون منتج</option>'+ps.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' — '+esc(names.get(String(p.store_id))||"مطعم")+"</option>").join("");}catch(e){sel.innerHTML='<option value="">تعذر تحميل المنتجات — يمكن نشر عرض عام</option>';}}
+function renderStoreHoursEditor(store){
+ let schedule={};try{schedule=JSON.parse(store.opening_hours||"{}")||{};}catch(e){}
+ const days=[["sun","الأحد"],["mon","الاثنين"],["tue","الثلاثاء"],["wed","الأربعاء"],["thu","الخميس"],["fri","الجمعة"],["sat","السبت"]];
+ return '<div class="store-hours-editor"><b>🕒 الدوام الأسبوعي</b><p class="muted">فعّل الأيام وحدد وقت الفتح والإغلاق. إذا لم تفعّل أي يوم، يبقى المتجر حسب زر الفتح والإغلاق اليدوي.</p>'+days.map(([key,label])=>{const d=schedule[key]||{};return '<div class="store-hours-row"><label><input type="checkbox" id="hours-'+store.id+'-'+key+'" '+(d.enabled?'checked':'')+'> '+label+'</label><input type="time" id="hours-open-'+store.id+'-'+key+'" value="'+esc(d.open||"09:00")+'"><span>إلى</span><input type="time" id="hours-close-'+store.id+'-'+key+'" value="'+esc(d.close||"22:00")+'"></div>';}).join("")+'<button type="button" onclick="saveStoreHours('+Number(store.id)+')">💾 حفظ الدوام</button><p class="muted" id="hours-status-'+store.id+'" role="status"></p></div>';
+}
+async function saveStoreHours(id){
+ const status=document.getElementById("hours-status-"+id),schedule={};
+ try{
+  for(const key of ["sun","mon","tue","wed","thu","fri","sat"]){
+   const enabled=document.getElementById("hours-"+id+"-"+key).checked,open=document.getElementById("hours-open-"+id+"-"+key).value,close=document.getElementById("hours-close-"+id+"-"+key).value;
+   if(enabled&&(!open||!close||open===close))throw Error("تأكد من أوقات الفتح والإغلاق لكل يوم مفعّل.");
+   schedule[key]={enabled,open,close};
+  }
+  status.textContent="جارٍ حفظ الدوام...";
+  await api("stores?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({opening_hours:JSON.stringify(schedule)})});
+  status.textContent="تم حفظ الدوام الأسبوعي بنجاح.";
+ }catch(e){status.textContent="تعذر حفظ الدوام: "+(e.message||"خطأ");}
+}
 async function loadStoreManagement(){
- const stores=await api("stores?select=id,name,category,description,emoji,is_active,logo_url,cover_image_url&order=name");
+ const stores=await api("stores?select=id,name,category,description,emoji,is_active,logo_url,cover_image_url,opening_hours&order=name");
  for(const id of ["productStore","accountStore"]){const sel=document.getElementById(id);const old=sel.value;sel.innerHTML=stores.filter(s=>s.is_active).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join("");if(old&&stores.some(s=>String(s.id)===old&&s.is_active))sel.value=old;}
  const list=document.getElementById("storeList");
- list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'● مفتوح':'● مغلق')+'</span></div><p class="muted">'+(s.logo_url?'<img src="'+esc(s.logo_url)+'" alt="شعار" style="width:48px;height:48px;object-fit:cover;border-radius:10px;vertical-align:middle;margin-left:8px">':'')+(s.cover_image_url?'<img src="'+esc(s.cover_image_url)+'" alt="غلاف" style="width:100%;max-height:90px;object-fit:cover;border-radius:10px;margin:8px 0">':'')+'<label>تغيير الشعار (اختياري)</label><input id="storeLogoFile'+Number(s.id)+'" type="file" accept="image/jpeg,image/png,image/webp"><label>تغيير صورة الغلاف (اختياري)</label><input id="storeCoverFile'+Number(s.id)+'" type="file" accept="image/jpeg,image/png,image/webp">' +'<p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p><button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إغلاق المطعم':'فتح المطعم')+'</button><button type="button" class="danger" onclick="deleteStore('+Number(s.id)+')">🗑️ حذف نهائي</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
+ list.innerHTML=stores.map(s=>'<div class="panel"><div class="row"><b>'+esc(s.emoji||"🍽️")+' '+esc(s.name)+'</b><span class="muted">'+(s.is_active?'● مفتوح':'● مغلق')+'</span></div><p class="muted">'+(s.logo_url?'<img src="'+esc(s.logo_url)+'" alt="شعار" style="width:48px;height:48px;object-fit:cover;border-radius:10px;vertical-align:middle;margin-left:8px">':'')+(s.cover_image_url?'<img src="'+esc(s.cover_image_url)+'" alt="غلاف" style="width:100%;max-height:90px;object-fit:cover;border-radius:10px;margin:8px 0">':'')+'<label>تغيير الشعار (اختياري)</label><input id="storeLogoFile'+Number(s.id)+'" type="file" accept="image/jpeg,image/png,image/webp"><label>تغيير صورة الغلاف (اختياري)</label><input id="storeCoverFile'+Number(s.id)+'" type="file" accept="image/jpeg,image/png,image/webp">' +'<p class="muted">'+esc(s.category||"")+' — '+esc(s.description||"")+'</p>'+renderStoreHoursEditor(s)+'<button type="button" onclick="editStore('+Number(s.id)+')">✏️ تعديل</button><button type="button" class="'+(s.is_active?'danger':'')+'" onclick="toggleStore('+Number(s.id)+','+(!s.is_active)+')">'+(s.is_active?'إغلاق المطعم':'فتح المطعم')+'</button><button type="button" class="danger" onclick="deleteStore('+Number(s.id)+')">🗑️ حذف نهائي</button></div>').join("")||'<p class="muted">لا توجد مطاعم.</p>';
  await loadProductsForStore();
 }
 async function editStore(id){
  try{
-  const rows=await api("stores?select=id,name,category,description,emoji,logo_url,cover_image_url,commission_percent&id=eq."+encodeURIComponent(id));
+  const rows=await api("stores?select=id,name,category,description,emoji,logo_url,cover_image_url,commission_percent,opening_hours&id=eq."+encodeURIComponent(id));
   const st=rows[0];if(!st)throw Error("المطعم غير موجود.");
   const name=prompt("اسم المطعم:",st.name);if(name===null)return;if(!name.trim())throw Error("اسم المطعم مطلوب.");
   const category=prompt("نوع المطعم:",st.category||"مطعم");if(category===null)return;
