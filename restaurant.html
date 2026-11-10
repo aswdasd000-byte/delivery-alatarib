@@ -59,6 +59,37 @@ label{display:block;font-size:13px;color:#ddd;font-weight:700}
 a{color:#8da8ff}
 @media(max-width:600px){main{padding:12px 11px 24px}#profilePanel .profile-fields{grid-template-columns:1fr}.panel{padding:14px}.brand-title h1{font-size:15px}.header-link{padding:8px;font-size:11px}#orders>.tabs{top:62px}}
 </style>
+
+<style id="premium-dashboard-theme">
+:root{
+ --brand:#14243d!important;--accent:#c7a45b!important;--bg:#101827!important;
+ --surface:#19263a!important;--surface2:#22324a!important;--line:#34445b!important;
+ --text:#f7f3e9!important;--muted:#c2c9d2!important;--success:#3caf83!important;
+ --danger:#d65d62!important;
+}
+body{background:linear-gradient(160deg,#101827 0%,#142238 55%,#101827 100%)!important;color:#f7f3e9!important}
+header{background:linear-gradient(115deg,#101b30,#203653)!important;border-bottom:1px solid #c7a45b66!important;box-shadow:0 5px 22px #0006!important}
+.panel,.card,.stat-card,.order-card,.section-card,.modal-content,.sheet,.tab-content{
+ background:linear-gradient(145deg,#1b2a40,#172338)!important;border-color:#3a4b62!important;
+ box-shadow:0 8px 24px #0003!important;
+}
+button,.btn,.primary-btn,[type=submit]{
+ border-radius:12px!important;font-weight:800!important;
+}
+button.primary,.btn-primary,.primary-btn,[type=submit]{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;color:#172238!important;border:0!important;
+}
+button.secondary,.btn-secondary,.header-link{
+ border:1px solid #c7a45b66!important;
+}
+input,select,textarea{
+ background:#101b2d!important;color:#f7f3e9!important;border:1px solid #43546b!important;border-radius:11px!important;
+}
+input::placeholder,textarea::placeholder{color:#9ca9b8!important}
+a{accent-color:#c7a45b}
+hr{border-color:#34445b!important}
+</style>
+
 </head><body><header><div class="brandbar"><img class="brand-logo" src="./icon-512.png?v=20261103b" alt="شعار ديليفري الأتارب"><div class="brand-title"><h1>ديليفري الأتارب</h1><p>لوحة المطعم • إدارة الطلبات</p></div><a class="header-link" href="./">واجهة الزبون</a></div></header><main><section id="login" class="panel"><h3>تسجيل الدخول</h3><label>البريد الإلكتروني</label><input id="email" type="email" required><label>كلمة المرور</label><input id="password" type="password" required><button id="loginBtn">دخول</button><p id="message" class="muted">الدخول مخصص للحسابات المصرّح لها فقط.</p></section><section id="app" class="hidden"><div class="panel hidden" id="profilePanel"><div class="row"><h3>👤 ملفي الشخصي</h3><button class="danger" type="button" onclick="logoutAccount()">تسجيل الخروج</button></div><p class="muted" id="profileEmail"></p><div class="profile-fields"><div><label>الاسم</label><input id="profileName" maxlength="100" placeholder="اسمك"></div><div><label>رقم الهاتف</label><input id="profilePhone" maxlength="30" placeholder="رقم الهاتف"></div><div><label>كلمة مرور جديدة (اختياري)</label><input id="profilePassword" type="password" minlength="8" placeholder="اتركها فارغة إذا لا تريد تغييرها"></div></div><div class="profile-actions"><button type="button" onclick="saveProfile()">حفظ بياناتي</button><p id="profileStatus" class="muted" role="status"></p></div></div><div id="dashboardContent"><div class="row"><h3>لوحة المطعم</h3><button type="button" onclick="start()">↻ تحديث الطلبات</button></div><nav class="work-tabs" aria-label="أقسام لوحة المطعم"><button class="active" type="button" data-work-tab="orders" onclick="showRestaurantTab('orders')">📦 الطلبات</button><button type="button" data-work-tab="products" onclick="showRestaurantTab('products')">🍔 المنتجات</button><button type="button" data-work-tab="branding" onclick="showRestaurantTab('branding')">🖼️ صور المطعم</button><button type="button" data-work-tab="settings" onclick="showRestaurantTab('settings')">⚙️ الإعدادات</button></nav><div class="panel"><button id="enableStorePush" type="button">🔔 تفعيل إشعارات المطعم</button><p id="storePushStatus" class="muted" aria-live="polite">فعّل الإشعارات على هذا الجهاز لاستقبال الطلبات الجديدة.</p></div><p class="muted" id="scopeNote">تعرض الطلبات الخاصة بالمطعم المحدد.</p><section class="panel restaurant-work-section hidden" data-work-section="branding" id="storeBrandManagement"><h3>🖼️ صور وهوية المطعم</h3><p class="muted">اختر الشعار وصورة الغلاف ثم اضغط حفظ الصور.</p><label>شعار المطعم</label><input id="storeLogoUpload" type="file" accept="image/jpeg,image/png,image/webp"><img id="storeLogoPreview" class="hidden" style="width:86px;height:86px;object-fit:cover;border-radius:14px"><label>صورة غلاف المطعم</label><input id="storeCoverUpload" type="file" accept="image/jpeg,image/png,image/webp"><img id="storeCoverPreview" class="hidden" style="width:100%;max-height:160px;object-fit:cover;border-radius:14px"><button id="saveStoreImagesBtn" type="button">💾 حفظ صور المطعم</button><p id="storeImagesStatus" class="muted" role="status"></p></section><section class="panel restaurant-work-section hidden" data-work-section="products" id="productManagement"><h3>🍔 إدارة المنتجات</h3><p class="muted">أضف منتجات مطعمك وعدّل أسعارها أو أوقف توفرها. الصور يضيفها المدير من لوحة الإدارة حالياً.</p><label>تصنيف المنتج</label><input id="storeProductCategory" maxlength="60" placeholder="مثلاً: فروج مشوي"><label>اسم المنتج</label><input id="storeProductName" maxlength="100" placeholder="مثلاً: شاورما دجاج"><label>السعر بالليرة السورية</label><input id="storeProductPrice" type="number" min="1" step="1" placeholder="مثلاً: 25000"><label>الوصف</label><input id="storeProductDescription" maxlength="250" placeholder="المكونات أو الحجم"><label>صورة المنتج</label><input id="storeProductImage" type="file" accept="image/jpeg,image/png,image/webp"><img id="storeProductImagePreview" class="hidden" style="width:100px;height:100px;object-fit:cover;border-radius:12px"><button id="saveStoreProductImageBtn" type="button">💾 حفظ المنتج والصورة</button><label>إيموجي بديل</label><input id="storeProductEmoji" maxlength="8" value="🍔"><button id="addStoreProductBtn" type="button">➕ إضافة المنتج</button><p id="storeProductStatus" class="muted" role="status"></p><h4>منتجات المطعم</h4><div id="storeProductList"></div></section><section class="panel restaurant-work-section hidden" data-work-section="settings" id="restaurantSettings">
 <h3>⚙️ إعدادات المطعم</h3>
 <p class="muted">عدّل بيانات التشغيل التي تظهر للزبائن. التغييرات تُحفظ مباشرة في بيانات مطعمك.</p>
