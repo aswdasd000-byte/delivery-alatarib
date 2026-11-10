@@ -314,8 +314,12 @@ document.getElementById("driverPayoutMode").addEventListener("change",()=>{docum
 document.getElementById("saveFinanceSettings").addEventListener("click",async()=>{const b=document.getElementById("saveFinanceSettings"),s=document.getElementById("financeStatus");const inside=Number(document.getElementById("insideFee").value),outside=Number(document.getElementById("outsideFee").value),value=Number(document.getElementById("driverPayoutValue").value),mode=document.getElementById("driverPayoutMode").value;if(!Number.isInteger(inside)||inside<0||!Number.isInteger(outside)||outside<0||!Number.isFinite(value)||value<0||(mode==="percent"&&value>100)){s.textContent="تحقق من الأسعار والقيم المدخلة؛ النسبة يجب ألا تتجاوز 100%.";return;}b.disabled=true;s.textContent="جارٍ الحفظ...";try{await api("delivery_finance_settings?id=eq.true",{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({inside_fee_syp:inside,outside_fee_syp:outside,driver_payout_mode:mode,driver_payout_value:value,updated_at:new Date().toISOString()})});s.textContent="تم حفظ الأسعار وطريقة أجرة السائق."; }catch(e){s.textContent="تعذر الحفظ: "+(e.message||"خطأ");}finally{b.disabled=false;}});
 
 let financialReportExportData=null;
-function exportFinancialExcel(){
- if(!financialReportExportData){alert("حمّل التقارير أولاً ثم أعد التصدير.");return;}
+async function exportFinancialExcel(){
+ const exportBtn=document.getElementById("exportFinancialExcel");
+ if(exportBtn)exportBtn.disabled=true;
+ try{
+ if(!financialReportExportData)await loadFinancialReports();
+ if(!financialReportExportData){alert("تعذر تجهيز بيانات التصدير. حدّث التقارير وتأكد من ظهور نتائجها.");return;}
  const escXml=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
  const sheet=(name,rows)=>'<Worksheet ss:Name="'+escXml(name)+'"><Table>'+rows.map(row=>'<Row>'+row.map(value=>{const numeric=typeof value==="number"&&Number.isFinite(value);return '<Cell><Data ss:Type="'+(numeric?"Number":"String")+'">'+escXml(value)+'</Data></Cell>';}).join("")+'</Row>').join("")+'</Table></Worksheet>';
  const d=financialReportExportData;
@@ -330,6 +334,8 @@ function exportFinancialExcel(){
  const blob=new Blob(["\ufeff",xml],{type:"application/vnd.ms-excel;charset=utf-8"});
  const url=URL.createObjectURL(blob),a=document.createElement("a"),stamp=new Date().toISOString().slice(0,10);
  a.href=url;a.download="تقارير-ديليفري-الأتارب-"+stamp+".xls";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+ }catch(e){alert("تعذر تصدير الملف: "+(e.message||"خطأ غير معروف"));}
+ finally{if(exportBtn)exportBtn.disabled=false;}
 }
 async function loadFinancialReports(){
  const status=document.getElementById("financialReportsStatus"),cards=document.getElementById("financialReportCards"),storesBox=document.getElementById("financialStoreBreakdown"),driversBox=document.getElementById("financialDriverBreakdown"),dailyBox=document.getElementById("financialDailyBreakdown"),ordersBox=document.getElementById("financialOrdersList"),btn=document.getElementById("refreshFinancialReports"),period=document.getElementById("financeReportPeriod")?.value||"30";
@@ -347,6 +353,7 @@ async function loadFinancialReports(){
   path+="&order=created_at.desc";
   const orders=await api(path);
   if(!orders.length){
+   financialReportExportData={summary:[["المؤشر","القيمة"],["عدد الطلبات المسلّمة",0]],stores:[["المطعم","عدد الطلبات","المبيعات ل.س","عمولة التطبيق ل.س","مستحق المطعم ل.س"]],drivers:[["السائق","أجور مستحقة ل.س"]],daily:[["التاريخ","عدد الطلبات","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجور السائقين ل.س","صافي التطبيق ل.س"]],orders:[["رقم الطلب","التاريخ","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجرة السائق ل.س","حالة الطلب"]]};
    const labels=[["📦 طلبات مسلّمة",0],["🛒 قيمة المنتجات",0],["💰 عمولة التطبيق",0],["🚚 رسوم التوصيل",0],["🛵 أجور السائقين",0],["🏪 مستحقات المطاعم",0],["📈 إيراد التطبيق قبل المصاريف",0]];
    cards.innerHTML=labels.map(([k,v])=>'<div class="analytics-card"><small>'+k+'</small><b>'+v.toLocaleString("ar")+'</b></div>').join("");
    for(const box of [storesBox,driversBox,dailyBox,ordersBox])box.innerHTML='<div class="finance-report-empty">لا توجد طلبات مسلّمة ضمن الفترة المحددة.</div>';
