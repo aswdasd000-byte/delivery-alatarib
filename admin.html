@@ -332,8 +332,15 @@ async function exportFinancialExcel(){
  ];
  const xml='<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'+sheets.join("")+'</Workbook>';
  const blob=new Blob(["\ufeff",xml],{type:"application/vnd.ms-excel;charset=utf-8"});
- const url=URL.createObjectURL(blob),a=document.createElement("a"),stamp=new Date().toISOString().slice(0,10);
- a.href=url;a.download="تقارير-ديليفري-الأتارب-"+stamp+".xls";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+ const a=document.createElement("a"),stamp=new Date().toISOString().slice(0,10);
+ a.download="تقارير-ديليفري-الأتارب-"+stamp+".xls";
+ try{
+  const url=URL.createObjectURL(blob);a.href=url;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+ }catch(downloadError){
+  a.href="data:application/vnd.ms-excel;charset=utf-8,"+encodeURIComponent("\\ufeff"+xml);
+  document.body.appendChild(a);a.click();a.remove();
+ }
+ const reportStatus=document.getElementById("financialReportsStatus");if(reportStatus)reportStatus.textContent="تم تجهيز ملف Excel. إذا لم يبدأ التنزيل، افتح قائمة التنزيلات في المتصفح.";
  }catch(e){alert("تعذر تصدير الملف: "+(e.message||"خطأ غير معروف"));}
  finally{if(exportBtn)exportBtn.disabled=false;}
 }
