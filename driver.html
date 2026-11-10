@@ -148,4 +148,53 @@ let html='<div class="tabs"><button type="button" class="driver-tab-btn active" 
 
 let driverRefreshBusy=false;async function start(){if(driverRefreshBusy)return;driverRefreshBusy=true;try{return await loadDriverOrders();}finally{driverRefreshBusy=false;}}
 setInterval(()=>{if(session?.access_token&&!document.getElementById("app").classList.contains("hidden"))start().catch(e=>console.warn("Driver refresh failed",e));},40000);
-window.addEventListener("DOMContentLoaded",async()=>{try{const saved=localStorage.getItem(SESSION_KEY);if(!saved)return;session=JSON.parse(saved);if(!session?.refresh_token){clearSession();return}if(session.expires_at&&Date.now()/1000>session.expires_at-60)await refreshSession();const role=String(session.user?.app_metadata?.role||"").toLowerCase().trim();isAdmin=role==="admin";await assertDriverAccess();showApp();await start();await restoreDriverPush();if(!isAdmin)locateDriver()}catch(e){document.getElementById("orders").innerHTML='<div class="panel">تعذر استعادة الجلسة أو تحميل الطلبات: '+esc(e.message||"خطأ غير معروف")+'</div>';if(!session?.refresh_token)clearSession()}});</script></body></html>
+window.addEventListener("DOMContentLoaded",async()=>{try{const saved=localStorage.getItem(SESSION_KEY);if(!saved)return;session=JSON.parse(saved);if(!session?.refresh_token){clearSession();return}if(session.expires_at&&Date.now()/1000>session.expires_at-60)await refreshSession();const role=String(session.user?.app_metadata?.role||"").toLowerCase().trim();isAdmin=role==="admin";await assertDriverAccess();showApp();await start();await restoreDriverPush();if(!isAdmin)locateDriver()}catch(e){document.getElementById("orders").innerHTML='<div class="panel">تعذر استعادة الجلسة أو تحميل الطلبات: '+esc(e.message||"خطأ غير معروف")+'</div>';if(!session?.refresh_token)clearSession()}});</script>
+<style id="driver-premium-polish">
+/* تحسينات بصرية للوحة السائق فقط */
+#dashboardContent>.row{
+ background:linear-gradient(115deg,#17263d,#263b59)!important;
+ border:1px solid #c7a45b66!important;border-radius:20px!important;
+ padding:18px!important;box-shadow:0 10px 26px #0003!important;
+}
+#dashboardContent>.row button,#locateDriverBtn,#loginBtn{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;
+ color:#172238!important;border:0!important;min-height:46px!important;
+}
+#dashboardContent>.panel{
+ border:1px solid #c7a45b55!important;
+}
+#orders article.panel{
+ background:linear-gradient(145deg,#1c2c43,#172338)!important;
+ border:1px solid #40516a!important;border-radius:19px!important;
+ box-shadow:0 8px 22px #0003!important;
+}
+#orders article .row{border-color:#40516a!important}
+#orders article button{
+ border-radius:13px!important;box-shadow:0 4px 12px #0002!important;
+}
+#orders article button:not(.danger){
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;
+ color:#172238!important;
+}
+#orders article button.danger{background:#a9444b!important;color:#fff!important}
+#login{margin-top:34px!important;border:1px solid #c7a45b66!important}
+#login h3,#profilePanel h3{color:#f2d99b!important}
+#profilePanel .profile-actions button{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;color:#172238!important;
+}
+#driverLocationStatus{display:inline-block;padding:8px}
+.map{border:1px solid #c7a45b77!important;box-shadow:0 5px 16px #0003!important}
+.dashboard-bottom-nav{
+ background:rgba(16,27,45,.97)!important;border-top:1px solid #c7a45b66!important;
+ backdrop-filter:blur(14px)!important;
+}
+.dashboard-bottom-nav button.active{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;color:#172238!important;
+}
+input,select,textarea{min-height:47px!important}
+@media(max-width:600px){
+ #dashboardContent>.row{padding:15px!important}
+ #orders article.panel{padding:14px!important}
+}
+</style>
+</body></html>
