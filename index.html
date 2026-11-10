@@ -1530,5 +1530,121 @@ nav button{min-width:0;flex:1 1 0;padding-left:3px!important;padding-right:3px!i
 }
 </style>
 
+
+<style id="customer-light-theme-v7">
+/* المرحلة 7: تحويل واجهة الزبون إلى مظهر فاتح عاجي مع أخضر زمردي ولمسات ذهبية */
+:root{
+  --brand:#16845b!important;
+  --brand-soft:#e4f3eb!important;
+  --bg:#f6f7f2!important;
+  --ink:#24352d!important;
+  --muted:#718078!important;
+  --card:#ffffff!important;
+  --line:#e1e9e2!important;
+  --customer-gold:#c49a45;
+  --customer-gold-light:#e4c77f;
+  --customer-navy:#f6f7f2;
+  --customer-panel:#ffffff;
+  --customer-border:#e1e9e2;
+}
+html,body{
+  background:#f6f7f2!important;
+  color:#24352d!important;
+}
+body{color:#24352d!important}
+header{
+  background:linear-gradient(115deg,#ffffff,#f2f7f2 65%,#ffffff)!important;
+  border-bottom:1px solid #e2eae3!important;
+  box-shadow:0 3px 14px #29473512!important;
+}
+.location-chip{
+  background:#edf5ef!important;border:1px solid #d8e7dc!important;color:#28543d!important;
+}
+.intro{
+  background:linear-gradient(125deg,#ffffff,#eef7f0)!important;
+  border:1px solid #dceadf!important;color:#284535!important;
+  box-shadow:0 5px 18px #2947350d!important;
+}
+.intro .muted{color:#718078!important}
+.store-filter-tabs{
+  background:#ffffff!important;border-color:#e1e9e2!important;
+  box-shadow:0 3px 12px #2947350c!important;
+}
+.store-filter-tabs button{color:#53645a!important}
+.store-filter-tabs button.active{
+  color:#ffffff!important;
+  background:linear-gradient(115deg,#147b53,#219968)!important;
+  border-color:#147b53!important;
+}
+.primary,#storeCartBar,#stores .store-card button,
+#productDetailPage button.primary,#cartView button.primary{
+  background:linear-gradient(115deg,#147b53,#219968)!important;
+  color:#ffffff!important;border:1px solid #147b53!important;
+  box-shadow:0 4px 12px #147b5326!important;
+}
+#customerSearchToggle,#customerBellBtn{
+  color:#187b55!important;background:#ffffff!important;border:1px solid #dfe9e1!important;
+}
+.panel,#productDetailPage,#cartView #customDeliveryForm,
+#cartView #basketCheckoutPanel,.card{
+  background:#ffffff!important;border-color:#e2e9e3!important;
+  color:#26382e!important;box-shadow:0 4px 16px #2947350c!important;
+}
+#products .card,#storeDetailProducts .card{
+  background:#ffffff!important;border-color:#e3eae4!important;
+  box-shadow:0 4px 14px #29473510!important;
+}
+#stores .store-card{
+  background:#ffffff!important;border-color:#e1e9e2!important;
+  box-shadow:0 7px 20px #29473512!important;
+}
+#stores .store-card-body{background:#ffffff!important}
+#stores .store-cover-placeholder{
+  background:radial-gradient(circle at 50% 40%,#dceee2,#edf5ef 72%)!important;
+  color:#16845b!important;
+}
+#stores .store-cover-state{
+  background:#ffffffed!important;color:#147b53!important;
+  border-color:#cce4d4!important;box-shadow:0 3px 12px #203c2a20!important;
+}
+#stores .store-cover-state.closed{
+  color:#a3444c!important;background:#fff7f7!important;border-color:#f0d5d7!important;
+}
+.store-card h3,.card h3,.panel h3,
+#storeDetailView h2,#productDetailPage h2{color:#26382e!important}
+p,.muted,small{color:inherit}
+input,textarea,select{
+  background:#ffffff!important;border:1px solid #dce6de!important;
+  color:#26382e!important;box-shadow:inset 0 1px 2px #29473508!important;
+}
+input::placeholder,textarea::placeholder{color:#98a69d!important}
+nav{
+  background:rgba(255,255,255,.97)!important;
+  border-top:1px solid #e1e9e2!important;
+  box-shadow:0 -5px 18px #29473516!important;
+}
+nav button{color:#77857c!important}
+nav button.active{
+  color:#147b53!important;box-shadow:inset 0 3px 0 #16845b!important;
+}
+nav button[data-view="cart"] span{background:#16845b!important;color:#ffffff!important}
+#ordersView .orders-filters button.active{
+  background:linear-gradient(115deg,#147b53,#219968)!important;
+  border-color:#147b53!important;color:#ffffff!important;
+}
+#ordersView .order-number>b,#ordersView .orders-page-title span{color:#147b53!important}
+a{color:#147b53}
+button:focus-visible,a:focus-visible,input:focus-visible,
+textarea:focus-visible,select:focus-visible{
+  outline:2px solid #16845b!important;outline-offset:3px;
+}
+.store-rating{color:#bd8d2f!important}
+@media(prefers-reduced-motion:no-preference){
+  .store-card,.mini-store-card,.panel,.card{
+    transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+  }
+}
+</style>
+
 </body>
 </html>
