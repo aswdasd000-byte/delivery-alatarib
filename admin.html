@@ -438,10 +438,16 @@ async function loadFinancialReports(){
   let path="orders?select=id,order_number,status,subtotal_syp,delivery_fee_syp,created_at,assigned_driver_id,platform_commission_syp,driver_payout_syp,loyalty_discount_syp&status=eq."+encodeURIComponent("تم التسليم");
   if(from)path+="&created_at=gte."+encodeURIComponent(from.toISOString());
   path+="&order=created_at.desc";
-  const orders=await api(path);
+  const expensePath="operational_expenses?select=id,category,amount_syp,expense_date,vendor,note,created_at"+(from?"&expense_date=gte."+encodeURIComponent(from.toISOString().slice(0,10)):"")+"&order=expense_date.desc,created_at.desc";
+  const [orders,expenses]=await Promise.all([api(path),api(expensePath)]);
+  const expenseTotal=expenses.reduce((sum,x)=>sum+(Number(x.amount_syp)||0),0);
+  const expenseRows=[["التاريخ","نوع المصروف","المبلغ ل.س","الجهة","الملاحظة"],...expenses.map(x=>[x.expense_date,x.category,Number(x.amount_syp)||0,x.vendor||"",x.note||""])];
+  const expenseList=document.getElementById("operationalExpensesList"),expenseCards=document.getElementById("expenseSummaryCards");
+  if(expenseList)expenseList.innerHTML=expenses.slice(0,50).map(x=>'<div class="finance-report-row"><div><b>'+esc(x.category)+'</b><small>'+esc(x.expense_date)+(x.vendor?" • "+esc(x.vendor):"")+(x.note?" • "+esc(x.note):"")+'</small></div><b>'+money(x.amount_syp)+'</b></div>').join("")||'<div class="finance-report-empty">لا توجد مصاريف مسجلة ضمن الفترة.</div>';
+  if(expenseCards)expenseCards.innerHTML='<div class="analytics-card"><small>إجمالي المصاريف</small><b>'+money(expenseTotal)+'</b></div>';
   if(!orders.length){
-   financialReportExportData={summary:[["المؤشر","القيمة"],["عدد الطلبات المسلّمة",0]],stores:[["المطعم","عدد الطلبات","المبيعات ل.س","عمولة التطبيق ل.س","مستحق المطعم ل.س"]],drivers:[["السائق","أجور مستحقة ل.س"]],daily:[["التاريخ","عدد الطلبات","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجور السائقين ل.س","صافي التطبيق ل.س"]],orders:[["رقم الطلب","التاريخ","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجرة السائق ل.س","حالة الطلب"]]};
-   const labels=[["📦 طلبات مسلّمة",0],["🛒 قيمة المنتجات",0],["💰 عمولة التطبيق",0],["🚚 رسوم التوصيل",0],["🛵 أجور السائقين",0],["🏪 مستحقات المطاعم",0],["📈 إيراد التطبيق قبل المصاريف",0]];
+   financialReportExportData={summary:[["المؤشر","القيمة"],["عدد الطلبات المسلّمة",0],["المصاريف التشغيلية ل.س",expenseTotal],["صافي الربح بعد المصاريف ل.س",-expenseTotal]],expenses:expenseRows,stores:[["المطعم","عدد الطلبات","المبيعات ل.س","عمولة التطبيق ل.س","مستحق المطعم ل.س"]],drivers:[["السائق","أجور مستحقة ل.س"]],daily:[["التاريخ","عدد الطلبات","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجور السائقين ل.س","صافي التطبيق ل.س"]],orders:[["رقم الطلب","التاريخ","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجرة السائق ل.س","حالة الطلب"]]};
+   const labels=[["📦 طلبات مسلّمة",0],["🛒 قيمة المنتجات",0],["💰 عمولة التطبيق",0],["🚚 رسوم التوصيل",0],["🛵 أجور السائقين",0],["🏪 مستحقات المطاعم",0],["📈 إيراد التطبيق قبل المصاريف",0],["🧾 المصاريف التشغيلية",money(expenseTotal)],["💵 صافي بعد المصاريف",money(-expenseTotal)]];
    cards.innerHTML=labels.map(([k,v])=>'<div class="analytics-card"><small>'+k+'</small><b>'+v.toLocaleString("ar")+'</b></div>').join("");
    for(const box of [storesBox,driversBox,dailyBox,ordersBox])box.innerHTML='<div class="finance-report-empty">لا توجد طلبات مسلّمة ضمن الفترة المحددة.</div>';
    status.textContent="لا توجد عمليات مالية مسلّمة ضمن هذه الفترة.";return;
@@ -478,8 +484,8 @@ async function loadFinancialReports(){
    driverTotals.set(did,driverTotals.get(did)+driverPay);
    if(did==="unassigned"&&driverPay>0)unassignedPayout+=driverPay;
   }
-  const restaurantDue=sales-commission,appIncome=commission+delivery-payout;
-  const metrics=[["📦 طلبات مسلّمة",orders.length],["🛒 قيمة المنتجات",money(sales)],["💰 عمولة التطبيق",money(commission)],["🚚 رسوم التوصيل",money(delivery)],["🛵 أجور السائقين",money(payout)],["🏪 مستحقات المطاعم",money(restaurantDue)],["📈 إيراد التطبيق قبل المصاريف",money(appIncome)],["🎁 خصومات النقاط",money(discounts)]];
+  const restaurantDue=sales-commission,appIncome=commission+delivery-payout,netAfterExpenses=appIncome-expenseTotal;
+  const metrics=[["📦 طلبات مسلّمة",orders.length],["🛒 قيمة المنتجات",money(sales)],["💰 عمولة التطبيق",money(commission)],["🚚 رسوم التوصيل",money(delivery)],["🛵 أجور السائقين",money(payout)],["🏪 مستحقات المطاعم",money(restaurantDue)],["📈 إيراد التطبيق قبل المصاريف",money(appIncome)],["🧾 المصاريف التشغيلية",money(expenseTotal)],["💵 صافي بعد المصاريف",money(netAfterExpenses)],["🎁 خصومات النقاط",money(discounts)]];
   cards.innerHTML=metrics.map(([k,v])=>'<div class="analytics-card"><small>'+k+'</small><b>'+v+'</b></div>').join("");
   storesBox.innerHTML=[...storeTotals.entries()].sort((a,b)=>b[1].sales-a[1].sales).map(([id,x])=>'<div class="finance-report-row"><div><b>'+esc(x.name)+'</b><small>'+x.orders.size.toLocaleString("ar")+' طلبات • عمولة التطبيق: '+money(x.commission)+'</small></div><div><b>'+money(x.sales-x.commission)+'</b><small>مستحق المطعم من مبيعات '+money(x.sales)+'</small></div></div>').join("")||'<div class="finance-report-empty">لا توجد بيانات مطاعم.</div>';
   const driverNames=new Map((driverData.drivers||[]).map(d=>[String(d.user_id),d.name||d.email||"سائق"]));
@@ -492,9 +498,9 @@ async function loadFinancialReports(){
   const storeExport=[["المطعم","عدد الطلبات","المبيعات ل.س","عمولة التطبيق ل.س","مستحق المطعم ل.س"],...[...storeTotals.entries()].map(([id,x])=>[x.name,x.orders.size,x.sales,x.commission,x.sales-x.commission])];
   const driverExport=[["السائق","أجور مستحقة ل.س"],...[...driverTotals.entries()].map(([id,total])=>[id==="unassigned"?"غير مرتبط بسائق":driverNames.get(id)||("سائق "+id.slice(-6)),total])];
   const orderExport=[["رقم الطلب","التاريخ","قيمة المنتجات ل.س","رسوم التوصيل ل.س","عمولة التطبيق ل.س","أجرة السائق ل.س","حالة الطلب"],...orders.map(o=>[o.order_number,new Date(o.created_at).toLocaleString("ar"),Number(o.subtotal_syp)||0,Number(o.delivery_fee_syp)||0,Number(o.platform_commission_syp)||0,Number(o.driver_payout_syp)||0,o.status])];
-  financialReportExportData={summary:[["المؤشر","القيمة"],["عدد الطلبات المسلّمة",orders.length],["قيمة المنتجات ل.س",sales],["عمولة التطبيق ل.س",commission],["رسوم التوصيل ل.س",delivery],["أجور السائقين ل.س",payout],["مستحقات المطاعم ل.س",restaurantDue],["إيراد التطبيق قبل المصاريف ل.س",appIncome],["خصومات النقاط ل.س",discounts]],stores:storeExport,drivers:driverExport,daily:dailyExport,orders:orderExport};
+  financialReportExportData={summary:[["المؤشر","القيمة"],["عدد الطلبات المسلّمة",orders.length],["قيمة المنتجات ل.س",sales],["عمولة التطبيق ل.س",commission],["رسوم التوصيل ل.س",delivery],["أجور السائقين ل.س",payout],["مستحقات المطاعم ل.س",restaurantDue],["إيراد التطبيق قبل المصاريف ل.س",appIncome],["المصاريف التشغيلية ل.س",expenseTotal],["صافي بعد المصاريف ل.س",netAfterExpenses],["خصومات النقاط ل.س",discounts]],stores:storeExport,drivers:driverExport,daily:dailyExport,orders:orderExport,expenses:expenseRows};
   const periodLabel=period==="today"?"اليوم":period==="7"?"آخر 7 أيام":period==="30"?"آخر 30 يوماً":period==="month"?"هذا الشهر":"كل الفترة";
-  status.textContent="الفترة: "+periodLabel+" • تم احتساب "+orders.length.toLocaleString("ar")+" طلباً مسلّماً. "+(unassignedPayout?"يوجد مبلغ سائق غير مرتبط بحساب: "+money(unassignedPayout)+".":"");
+  status.textContent="الفترة: "+periodLabel+" • تم احتساب "+orders.length.toLocaleString("ar")+" طلباً مسلّماً، ومصاريف "+money(expenseTotal)+". صافي التطبيق بعد المصاريف: "+money(netAfterExpenses)+". "+(unassignedPayout?"يوجد مبلغ سائق غير مرتبط بحساب: "+money(unassignedPayout)+".":"");
  }catch(e){
   status.textContent="تعذر تحميل التقارير المالية: "+(e.message||"خطأ غير معروف");
   for(const box of [storesBox,driversBox,ordersBox])box.innerHTML='<div class="finance-report-empty">تعذر تحميل البيانات.</div>';
