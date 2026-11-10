@@ -1372,5 +1372,40 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  #storeDetailProducts .card>.product-visual{width:100%;height:145px}
 }
 </style>
+
+<style id="customer-product-card-compact-v4">
+/* تقليل ارتفاع بطاقة المنتج مع إبقاء النص أسفل الصورة */
+#storeDetailProducts .card{
+  padding:8px!important;
+  row-gap:5px!important;
+  border-radius:13px!important;
+}
+#storeDetailProducts .card>.product-visual{
+  height:clamp(105px,32vw,145px)!important;
+  border-radius:10px!important;
+}
+#storeDetailProducts .card h3{
+  font-size:14px!important;
+  line-height:1.3!important;
+  padding-top:0!important;
+}
+#storeDetailProducts .card p{
+  font-size:12px!important;
+  line-height:1.35!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  margin:0!important;
+}
+#storeDetailProducts .card .price{
+  font-size:14px!important;
+  padding-top:1px!important;
+}
+@media(max-width:380px){
+  #storeDetailProducts .card>.product-visual{height:112px!important}
+}
+</style>
+
 </body>
 </html>
