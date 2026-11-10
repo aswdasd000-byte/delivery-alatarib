@@ -633,7 +633,7 @@ function renderOrders(){
  }).join(""):'<div class="orders-empty">لا توجد طلبات ضمن هذا التصنيف حالياً.</div>';
 }
 document.querySelectorAll("#ordersFilters [data-order-filter]").forEach(btn=>btn.addEventListener("click",()=>{activeOrderFilter=btn.dataset.orderFilter;document.querySelectorAll("#ordersFilters button").forEach(x=>x.classList.toggle("active",x===btn));renderOrders();}));
-function isCustomerOrderOnWay(status){return ["بالطريق","في الطريق","on_the_way"].includes(String(status||"").trim().toLowerCase());}
+function isCustomerOrderOnWay(status){const v=String(status||"").trim().toLowerCase().replace(/[🛵🚚📦✅]/g,"").replace(/[إأآ]/g,"ا").replace(/\s+/g," ");return ["بالطريق","في الطريق","on_the_way","السائق بالطريق اليك","السائق في الطريق اليك"].includes(v)||v.includes("بالطريق")||v.includes("في الطريق")||v.includes("on_the_way");}
 const customerTrackingMaps=new Map();const customerDriverMarkers=new Map();
 function initCustomerTrackingMaps(){if(!window.L)return;document.querySelectorAll(".customer-live-map").forEach(el=>{if(customerTrackingMaps.has(el.id))return;const map=L.map(el,{zoomControl:true}).setView([36.2,36.7],13);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);customerTrackingMaps.set(el.id,map);setTimeout(()=>map.invalidateSize(),120);});}
 
