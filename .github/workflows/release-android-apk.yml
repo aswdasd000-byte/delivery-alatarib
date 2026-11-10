@@ -15,9 +15,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: capacitor-app
     steps:
       - name: Check signing secrets
         shell: bash
@@ -57,12 +54,14 @@ jobs:
           /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install dependencies and generate Android project
+        working-directory: capacitor-app
         run: |
           npm install
           npx cap add android
           npx cap sync android
 
       - name: Configure release signing
+        working-directory: capacitor-app
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -101,6 +100,7 @@ jobs:
           PY
 
       - name: Build signed release APK
+        working-directory: capacitor-app
         run: |
           cd android
           chmod +x gradlew
