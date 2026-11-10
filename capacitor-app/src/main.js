@@ -6,27 +6,23 @@ const loading = document.getElementById('loading');
 frame.src = SITE_ORIGIN + '/delivery-alatarib/';
 frame.addEventListener('load', () => { loading.style.display = 'none'; });
 
-try {
-  await PushNotifications.createChannel({
-    id: 'delivery_orders',
-    name: 'إشعارات الطلبات',
-    description: 'تنبيهات الطلبات وتحديثاتها من ديليفري الأتارب',
-    importance: 5,
-    sound: 'default',
-    vibration: true
-  });
-} catch (error) {
-  console.warn('Could not create Android notification channel:', error);
-}
+PushNotifications.createChannel({
+  id: 'delivery_orders',
+  name: 'إشعارات الطلبات',
+  description: 'تنبيهات الطلبات وتحديثاتها من ديليفري الأتارب',
+  importance: 5,
+  sound: 'default',
+  vibration: true
+}).catch(error => console.warn('Could not create Android notification channel:', error));
 
-await PushNotifications.addListener('pushNotificationActionPerformed', action => {
+PushNotifications.addListener('pushNotificationActionPerformed', action => {
   const target = String(action?.notification?.data?.url || '');
   if (!target) return;
   const safePath = target.startsWith('/') ? target : '/' + target;
   if (!safePath.startsWith('/delivery-alatarib/')) return;
   frame.src = SITE_ORIGIN + safePath;
   loading.style.display = 'grid';
-});
+}).catch(error => console.warn('Could not add notification action listener:', error));
 
 let listenerReady = false;
 let pending = null;
