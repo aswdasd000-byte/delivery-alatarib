@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#171d2c">
+  <title>ديليفري الأتارب</title>
+  <style>
+    *{box-sizing:border-box}html,body,#app{width:100%;height:100%;margin:0;overflow:hidden;background:#fff}
+    #app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    #loading{position:fixed;inset:0;display:grid;place-items:center;background:#171d2c;color:#f4ead2;font:16px Arial;z-index:2}
+  </style>
+</head>
+<body>
+  <div id="loading">جارٍ فتح ديليفري الأتارب...</div>
+  <main id="app"><iframe id="deliverySite" title="ديليفري الأتارب" allow="geolocation; notifications"></iframe></main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
