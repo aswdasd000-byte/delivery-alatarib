@@ -341,4 +341,75 @@ async function start(){try{
  }catch(e){document.getElementById('orders').innerHTML='<div class="panel">تعذر تحميل الطلبات، لكن جلستك ما زالت محفوظة: '+esc(e.message)+'</div>';}}function toggleProfile(){const p=document.getElementById("profilePanel");p.classList.toggle("hidden");if(!p.classList.contains("hidden"))p.scrollIntoView({behavior:"smooth",block:"start"});}
 function renderProfile(){const u=session?.user||{},d=u.user_metadata||{};document.getElementById("profileEmail").textContent="البريد: "+(u.email||"");document.getElementById("profileName").value=d.full_name||d.name||"";document.getElementById("profilePhone").value=d.phone||"";document.getElementById("profilePassword").value="";}
 async function saveProfile(){const s=document.getElementById("profileStatus"),b=document.querySelector("#profilePanel button[onclick='saveProfile()']");b.disabled=true;s.textContent="جارٍ حفظ البيانات...";try{const data={...(session.user?.user_metadata||{}),full_name:document.getElementById("profileName").value.trim(),phone:document.getElementById("profilePhone").value.trim()};const password=document.getElementById("profilePassword").value;const payload={data};if(password){if(password.length<8)throw Error("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");payload.password=password;}const r=await fetch(URL+"/auth/v1/user",{method:"PUT",headers:{apikey:KEY,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw Error(d.msg||d.message||d.error_description||"تعذر حفظ البيانات.");session.user=d;saveSession();renderProfile();s.textContent="تم حفظ بيانات الملف الشخصي بنجاح.";}catch(e){s.textContent="تعذر الحفظ: "+(e.message||"خطأ");}finally{b.disabled=false;}}
-async function logoutAccount(){try{if(session?.access_token)await fetch(URL+"/auth/v1/logout",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+session.access_token}});}catch(e){}clearSession();location.reload();}</script></body></html>
+async function logoutAccount(){try{if(session?.access_token)await fetch(URL+"/auth/v1/logout",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+session.access_token}});}catch(e){}clearSession();location.reload();}</script>
+<style id="admin-premium-polish">
+/* صقل بصري للوحة المدير مع إبقاء وظائف الإدارة كما هي */
+#dashboardContent>.row{
+ background:linear-gradient(115deg,#17263d,#263b59)!important;
+ border:1px solid #c7a45b66!important;border-radius:20px!important;
+ padding:18px!important;box-shadow:0 10px 26px #0003!important;
+}
+#dashboardContent>.row button,#loginBtn{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;
+ color:#172238!important;border:0!important;
+}
+.admin-menu{
+ scrollbar-width:none!important;padding-top:11px!important;
+}
+.admin-menu::-webkit-scrollbar{display:none}
+.admin-menu button{
+ background:#1a2940!important;color:#d9e0e9!important;
+ border:1px solid #40516a!important;border-radius:14px!important;
+ box-shadow:0 3px 10px #0002!important;
+}
+.admin-menu button.active{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;
+ color:#172238!important;border-color:#e2c77f!important;
+}
+.analytics-grid{gap:12px!important}
+.analytics-card{
+ background:linear-gradient(145deg,#20324b,#172338)!important;
+ border:1px solid #c7a45b55!important;border-radius:17px!important;
+ box-shadow:0 6px 18px #0002!important;
+}
+.analytics-card small{color:#c2c9d2!important}
+.analytics-card b{color:#f2d99b!important}
+.analytics-bar{background:linear-gradient(180deg,#e2c77f,#b58c43)!important;border-radius:7px 7px 0 0!important}
+.admin-section>.panel,.admin-section .panel{
+ border-color:#40516a!important;
+}
+.admin-section h3,.section-heading{color:#f2d99b!important}
+button{box-shadow:0 3px 10px #0002}
+button.danger,.danger{background:#a9444b!important;color:#fff!important}
+.tabs button{
+ background:#1a2940!important;color:#d9e0e9!important;border-color:#40516a!important;
+}
+.tabs button.active{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;
+ color:#172238!important;border-color:#e2c77f!important;
+}
+#orders article.panel{
+ background:linear-gradient(145deg,#1c2c43,#172338)!important;
+ border:1px solid #40516a!important;border-radius:18px!important;
+}
+#orders article .row{border-color:#40516a!important}
+#orders article button:not(.danger){
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;color:#172238!important;
+}
+#login{margin-top:34px!important;border:1px solid #c7a45b66!important}
+#login h3,#profilePanel h3{color:#f2d99b!important}
+input,select,textarea{min-height:47px!important}
+input[type=file]{padding:9px!important}
+.dashboard-bottom-nav{
+ background:rgba(16,27,45,.97)!important;border-top:1px solid #c7a45b66!important;
+ backdrop-filter:blur(14px)!important;
+}
+.dashboard-bottom-nav button.active{
+ background:linear-gradient(120deg,#c7a45b,#e2c77f)!important;color:#172238!important;
+}
+@media(max-width:600px){
+ #dashboardContent>.row{padding:15px!important}
+ .analytics-card{padding:13px!important}
+}
+</style>
+</body></html>
