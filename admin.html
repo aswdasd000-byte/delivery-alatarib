@@ -335,7 +335,7 @@ async function exportFinancialExcel(){
  const a=document.createElement("a"),stamp=new Date().toISOString().slice(0,10);
  a.download="تقارير-ديليفري-الأتارب-"+stamp+".xls";
  try{
-  const url=URL.createObjectURL(blob);a.href=url;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+  const url=window.URL.createObjectURL(blob);a.href=url;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>window.URL.revokeObjectURL(url),3000);
  }catch(downloadError){
   a.href="data:application/vnd.ms-excel;charset=utf-8,"+encodeURIComponent("\\ufeff"+xml);
   document.body.appendChild(a);a.click();a.remove();
