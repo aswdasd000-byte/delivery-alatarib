@@ -81,14 +81,14 @@ jobs:
           if "com.google.gms:google-services" not in rs:
               if "dependencies {" not in rs:
                   raise SystemExit("Could not find root Gradle dependencies block")
-              rs = rs.replace("dependencies {", "dependencies {\\n" + plugin_line, 1)
+              rs = rs.replace("dependencies {", "dependencies {\n" + plugin_line, 1)
           root.write_text(rs)
           aps = app.read_text()
           if "com.google.gms.google-services" not in aps:
               if "apply plugin: 'com.android.application'" in aps:
-                  aps = aps.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\\napply plugin: 'com.google.gms.google-services'", 1)
+                  aps = aps.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'", 1)
               elif "plugins {" in aps:
-                  aps = aps.replace("plugins {", "plugins {\\n    id 'com.google.gms.google-services'", 1)
+                  aps = aps.replace("plugins {", "plugins {\n    id 'com.google.gms.google-services'", 1)
               else:
                   raise SystemExit("Could not find Android application plugin declaration")
           app.write_text(aps)
