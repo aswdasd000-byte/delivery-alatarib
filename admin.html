@@ -351,7 +351,7 @@ async function loadSettlementPanel(){
  if(btn)btn.disabled=true;status.textContent="جارٍ حساب المستحقات والدفعات...";
  try{
   const [orders,driversData,payments]=await Promise.all([
-   api("orders?select=id,order_number,status,subtotal_syp,assigned_driver_id&status=eq."+encodeURIComponent("تم التسليم")),
+   api("orders?select=id,order_number,status,subtotal_syp,driver_payout_syp,assigned_driver_id&status=eq."+encodeURIComponent("تم التسليم")),
    driverAdminRequest({action:"list"}).catch(()=>({drivers:[]})),
    api("settlement_payments?select=id,party_type,party_id,party_name,amount_syp,paid_at,note&order=paid_at.desc")
   ]);
