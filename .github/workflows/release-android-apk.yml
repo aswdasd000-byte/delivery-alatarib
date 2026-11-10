@@ -80,8 +80,8 @@ jobs:
           from pathlib import Path
           p = Path("android/app/build.gradle")
           s = p.read_text()
-          marker = "    signingConfigs {"
-          if marker not in s:
+
+          if "signingConfigs {" not in s:
               s = s.replace("    buildTypes {", """    signingConfigs {
                   release {
                       def props = new Properties()
@@ -95,8 +95,16 @@ jobs:
               }
 
               buildTypes {""", 1)
-          s = s.replace("        release {", "        release {\n            signingConfig signingConfigs.release", 1)
-          p.write_text(s)
+
+          head, marker, tail = s.partition("    buildTypes {")
+          if not marker:
+              raise SystemExit("Could not find buildTypes block in app/build.gradle")
+          tail = tail.replace(
+              "        release {",
+              "        release {\n            signingConfig signingConfigs.release",
+              1
+          )
+          p.write_text(head + marker + tail)
           PY
 
       - name: Build signed release APK
