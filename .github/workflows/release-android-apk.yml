@@ -60,6 +60,19 @@ jobs:
           npx cap add android
           npx cap sync android
 
+      - name: Generate branded Android app icon
+        working-directory: capacitor-app
+        run: |
+          mkdir -p assets
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          icon = Image.open("../icon-512.png").convert("RGBA")
+          icon.resize((1024, 1024), Image.Resampling.LANCZOS).save("assets/logo.png")
+          PY
+          npm install --no-save @capacitor/assets
+          npx @capacitor/assets generate --android --iconBackgroundColor '#171717' --iconBackgroundColorDark '#171717'
+
       - name: Configure release signing
         working-directory: capacitor-app
         env:
