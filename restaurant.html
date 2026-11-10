@@ -281,8 +281,7 @@ async function start(){
  const oids=[...new Set(items.map(i=>i.order_id))];
  if(!oids.length){document.getElementById("orders").innerHTML='<div class="panel">لا توجد طلبات لهذا المطعم حالياً.</div>';return;}
  const os=await api("orders?select=id,order_number,customer_name,customer_phone,delivery_address,status,created_at,assigned_driver_id,scheduled_for&id=in.("+oids.join(",")+")&order=created_at.desc");
- const ordersHtml=os.map(o=>{
-  const its=items.filter(i=>i.order_id===o.id);
+ const renderOrderCard=(o,its,isScheduled=false)=>{
   let action=o.status==="جديد"
    ?'<button onclick="updateStatus(\''+o.id+'\',\'قيد التحضير\')">✅ قبول الطلب وبدء التحضير</button><button class="danger" onclick="updateStatus(\''+o.id+'\',\'ملغي\')">رفض الطلب</button>'
    :o.status==="قيد التحضير"
@@ -294,8 +293,19 @@ async function start(){
       :o.status==="تم التسليم"
        ?'<p style="color:#16834a;font-weight:700">✅ تم تسليم الطلب للزبون.</p>'
        :'<p style="color:#a72b2b;font-weight:700">تم إلغاء الطلب.</p>';
-  return '<article class="panel"><div class="row"><b>طلب #'+esc(o.order_number)+'</b><b>'+esc(o.status)+'</b></div><p><b>الزبون:</b> '+esc(o.customer_name)+' • '+esc(o.customer_phone)+'</p><p><b>العنوان:</b> '+esc(o.delivery_address)+'</p>'+(o.scheduled_for?'<p style="background:#fff2d9;padding:9px;border-radius:9px;color:#704b13"><b>🗓️ موعد وصول الزبون:</b> '+esc(new Date(o.scheduled_for).toLocaleString("ar"))+'</p>':"")+'<ul>'+its.map(i=>'<li>'+esc(i.product_name)+' × '+esc(i.quantity)+'</li>').join('')+'</ul>'+action+'</article>';
- }).join("")||'<div class="panel">لا توجد طلبات لهذا المطعم حالياً.</div>';const ordersBox=document.getElementById("orders");if(ordersBox.innerHTML!==ordersHtml)ordersBox.innerHTML=ordersHtml;
+  const scheduledAt=o.scheduled_for?new Date(o.scheduled_for):null;
+  const remaining=scheduledAt?Math.round((scheduledAt.getTime()-Date.now())/60000):null;
+  const urgency=isScheduled?(remaining<0?'overdue':remaining<=60?'soon':''):'';
+  const timing=isScheduled
+   ?'<div class="scheduled-time '+urgency+'"><b>🗓️ موعد الوصول:</b> '+esc(scheduledAt.toLocaleString("ar",{dateStyle:"medium",timeStyle:"short"}))+(remaining<0?'<strong>• الموعد مرّ</strong>':remaining<=60?'<strong>• قريب خلال '+Math.max(0,remaining)+' دقيقة</strong>':'')+'</div>'
+   :(scheduledAt?'<p class="muted">🗓️ موعد الوصول: '+esc(scheduledAt.toLocaleString("ar"))+'</p>':'');
+  return '<article class="panel '+(isScheduled?'scheduled-order-card':'')+'"><div class="row"><b>طلب #'+esc(o.order_number)+'</b><b>'+esc(o.status)+'</b></div><p><b>الزبون:</b> '+esc(o.customer_name)+' • '+esc(o.customer_phone)+'</p><p><b>العنوان:</b> '+esc(o.delivery_address)+'</p>'+timing+'<ul>'+its.map(i=>'<li>'+esc(i.product_name)+' × '+esc(i.quantity)+'</li>').join('')+'</ul>'+action+'</article>';
+ };
+ const activeScheduled=os.filter(o=>o.scheduled_for&&["جديد","قيد التحضير","جاهز للاستلام"].includes(o.status)).sort((a,b)=>new Date(a.scheduled_for)-new Date(b.scheduled_for));
+ const scheduledHtml='<section class="scheduled-orders-section"><div class="scheduled-orders-heading"><h3>🗓️ الطلبات المجدولة</h3><span>'+activeScheduled.length+' طلب نشط</span></div>'+(activeScheduled.length?activeScheduled.map(o=>renderOrderCard(o,items.filter(i=>i.order_id===o.id),true)).join(''):'<p class="muted">ما في طلبات مجدولة قيد التنفيذ حالياً.</p>')+'</section>';
+ const regularOrders=os.filter(o=>!activeScheduled.some(x=>x.id===o.id));
+ const ordersHtml=scheduledHtml+regularOrders.map(o=>renderOrderCard(o,items.filter(i=>i.order_id===o.id),false)).join("");
+ const ordersBox=document.getElementById("orders");if(ordersBox.innerHTML!==ordersHtml)ordersBox.innerHTML=ordersHtml;
 }
 window.addEventListener("DOMContentLoaded",async()=>{try{const saved=localStorage.getItem(SESSION_KEY);if(!saved)return;session=JSON.parse(saved);if(!session?.refresh_token){clearSession();return}if(session.expires_at&&Date.now()/1000>session.expires_at-60)await refreshSession();const role=String(session.user?.app_metadata?.role||"").toLowerCase().trim();isAdmin=role==="admin";if(!isAdmin&&role!=="store"){document.getElementById("message").textContent="الجلسة محفوظة لكن صلاحية الحساب الحالية ("+(role||"غير محددة")+") لا تسمح بدخول لوحة المطعم.";clearSession();return}showApp();await start();await restoreStorePush()}catch(e){document.getElementById("orders").innerHTML='<div class="panel">تعذر تحديث الجلسة أو تحميل الطلبات. جرّب تسجيل الدخول من جديد إذا استمرت المشكلة.</div>';if(!session?.refresh_token)clearSession()}});function toggleProfile(){const p=document.getElementById("profilePanel");p.classList.toggle("hidden");if(!p.classList.contains("hidden"))p.scrollIntoView({behavior:"smooth",block:"start"});}
 function renderProfile(){const u=session?.user||{},d=u.user_metadata||{};document.getElementById("profileEmail").textContent="البريد: "+(u.email||"");document.getElementById("profileName").value=d.full_name||d.name||"";document.getElementById("profilePhone").value=d.phone||"";document.getElementById("profilePassword").value="";}
@@ -365,4 +375,14 @@ input[type=file]{padding:9px!important}
  #orders article.panel{padding:14px!important}
 }
 </style>
-</body></html>
+<style id="scheduled-orders-ui">
+.scheduled-orders-section{margin:0 0 20px;padding:14px;border:1px solid #c7a45b88;border-radius:18px;background:linear-gradient(145deg,#24344b,#18263b);box-shadow:0 8px 22px #0003}
+.scheduled-orders-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.scheduled-orders-heading h3{margin:0;color:#f2d99b;font-size:17px}
+.scheduled-orders-heading span{background:#c7a45b22;border:1px solid #c7a45b77;color:#f2d99b;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:800}
+#orders article.scheduled-order-card{border:1px solid #c7a45b99!important;background:linear-gradient(145deg,#263852,#1b2b42)!important}
+.scheduled-time{padding:11px 12px;margin:10px 0;border-radius:12px;background:#253e58;color:#f4e6bd;border:1px solid #c7a45b66;line-height:1.7}
+.scheduled-time.soon{background:#493c20;border-color:#e6bd58;color:#ffe4a0}
+.scheduled-time.overdue{background:#48272d;border-color:#d65d62;color:#ffd1d1}
+.scheduled-time strong{display:block;margin-top:3px}
+</style></body></html>
