@@ -1154,5 +1154,149 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 </style>
 
+
+<style id="customer-store-cards-v2">
+/* المرحلة 2: بطاقات المطاعم والمتاجر والصور والشعارات */
+#stores .store-card{
+  position:relative!important;
+  gap:0!important;
+  overflow:hidden!important;
+  border:1px solid #3a4b63!important;
+  border-radius:20px!important;
+  background:linear-gradient(160deg,#1b2a40,#152235)!important;
+  box-shadow:0 8px 22px #050b1466!important;
+}
+#stores .store-cover{
+  position:relative!important;
+  height:clamp(180px,27vw,235px)!important;
+  min-height:180px!important;
+  max-height:235px!important;
+  border-radius:0!important;
+  background:linear-gradient(135deg,#26364c,#111d2d)!important;
+}
+#stores .store-cover::after,
+.discovery-section .mini-store-cover::after{
+  content:"";position:absolute;inset:35% 0 0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(8,15,27,.58));
+}
+#stores .store-cover-photo{
+  position:relative!important;z-index:0!important;
+  object-fit:cover!important;object-position:center!important;
+}
+#stores .store-cover-placeholder{
+  background:radial-gradient(circle at 50% 40%,#354966,#172338 72%)!important;
+  color:#ecd49b!important;
+}
+#stores .store-cover-state{
+  left:12px!important;bottom:12px!important;z-index:2!important;
+  padding:6px 11px!important;border:1px solid #d8b46a!important;
+  background:#152235ed!important;color:#a9e8c1!important;
+  font-size:11px!important;box-shadow:0 3px 12px #0007!important;
+}
+#stores .store-cover-state.closed{
+  color:#ffc0c5!important;background:#38232bed!important;border-color:#a85c66!important;
+}
+#stores .store-free-delivery{z-index:3!important;top:11px!important;right:11px!important}
+#stores .store-card-body{
+  padding:12px 13px 14px!important;gap:9px!important;
+  background:linear-gradient(160deg,#1b2a40,#152235)!important;
+}
+#stores .store-identity{min-height:52px!important;gap:10px!important}
+#stores .store-logo{
+  display:grid!important;width:48px!important;height:48px!important;
+  flex:0 0 48px!important;border:2px solid #d8b46a!important;
+  background:#26364c!important;box-shadow:0 3px 10px #050b1466!important;
+}
+#stores .store-logo-photo{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+#stores .store-name h3{font-size:17px!important;line-height:1.35!important;color:#fff!important}
+#stores .store-name .store-type{font-size:11px!important;color:#c4ccd7!important}
+#stores .store-location{font-size:11px!important;color:#ecd49b!important}
+#stores .store-state{font-size:10px!important;padding:4px 8px!important}
+#stores .store-desc{
+  display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden!important;white-space:normal!important;
+  color:#c4ccd7!important;font-size:11px!important;line-height:1.55!important;
+}
+#stores .store-rating{font-size:12px!important;color:#f0d99e!important}
+#stores .store-rating small{color:#aeb9c8!important}
+#stores .store-meta{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
+#stores .store-meta span{
+  min-width:0!important;white-space:normal!important;text-align:center!important;
+  padding:8px 5px!important;border:1px solid #43536a!important;
+  border-radius:10px!important;background:#223149!important;
+  color:#ecd49b!important;font-size:10px!important;font-weight:750!important;
+}
+.discovery-section .mini-store-card{
+  border:1px solid #3a4b63!important;border-radius:19px!important;
+  background:#1a2638!important;box-shadow:0 7px 19px #050b1466!important;
+}
+.discovery-section .mini-store-cover{
+  position:relative!important;overflow:hidden!important;
+  border-radius:0!important;background:#172338!important;
+}
+.discovery-section .mini-store-cover img.mini-cover-photo{
+  position:relative;z-index:0;object-fit:cover!important;object-position:center!important;
+}
+.discovery-section .mini-store-cover .store-cover-state{z-index:2!important}
+.discovery-section .mini-store-body{
+  padding:10px 11px 12px!important;gap:8px!important;
+  background:linear-gradient(160deg,#1b2a40,#152235)!important;
+}
+.discovery-section .mini-store-identity{min-height:48px!important}
+.discovery-section .mini-store-logo{
+  width:46px!important;height:46px!important;flex:0 0 46px!important;
+  overflow:hidden!important;border:2px solid #d8b46a!important;
+  background:#26364c!important;box-shadow:0 2px 8px #050b1466!important;
+}
+.discovery-section .mini-store-logo img{
+  display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;
+}
+.discovery-section .mini-store-title b{font-size:15px!important;color:#fff!important}
+.discovery-section .mini-store-title small{font-size:11px!important;color:#b9c2cf!important}
+.discovery-section .mini-store-location{font-size:10px!important;color:#ecd49b!important}
+.discovery-section .mini-store-desc{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;color:#c4ccd7!important;font-size:11px!important;
+}
+.discovery-section .mini-store-meta{display:grid!important;grid-template-columns:1fr 1fr!important;overflow:visible!important}
+.discovery-section .mini-store-meta span{
+  min-width:0!important;white-space:normal!important;
+  padding:7px 5px!important;background:#223149!important;
+  border:1px solid #43536a!important;color:#ecd49b!important;
+  font-size:10px!important;
+}
+.favorite-store-btn{
+  width:38px!important;height:38px!important;top:10px!important;left:10px!important;
+  border:1px solid #d8b46a!important;background:#101827e8!important;
+  font-size:23px!important;box-shadow:0 3px 10px #0008!important;
+}
+#detailStoreHero .detail-cover{
+  height:clamp(210px,48vw,285px)!important;
+  min-height:clamp(210px,48vw,285px)!important;
+  max-height:285px!important;flex-basis:clamp(210px,48vw,285px)!important;
+  border-radius:18px!important;
+}
+#detailStoreHero .detail-logo{
+  border:2px solid #d8b46a!important;background:#26364c!important;
+  box-shadow:0 3px 10px #050b1466!important;
+}
+@media(max-width:380px){
+  #stores .store-cover{height:180px!important;min-height:180px!important}
+  #stores .store-card-body{padding:10px!important}
+  #stores .store-logo{width:42px!important;height:42px!important;flex-basis:42px!important}
+  #stores .store-name h3{font-size:15px!important}
+  #stores .store-meta span{font-size:9px!important}
+  .discovery-section .mini-store-card{flex-basis:86vw!important;width:86vw!important}
+}
+@media(prefers-reduced-motion:no-preference){
+  #stores .store-card,.discovery-section .mini-store-card{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;
+  }
+  #stores .store-card:active,.discovery-section .mini-store-card:active{
+    transform:scale(.992);box-shadow:0 4px 12px #050b1466!important;
+  }
+}
+</style>
+
 </body>
 </html>
