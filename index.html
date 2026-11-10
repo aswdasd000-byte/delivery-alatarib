@@ -1026,5 +1026,133 @@ button:focus-visible,a:focus-visible{outline:2px solid #f0d99e!important;outline
 </style>
 
 <style id="customer-track-button-style">.customer-track-button{display:block;width:100%;margin:12px 0;padding:14px;border:1px solid #d8b46a;border-radius:13px;background:linear-gradient(115deg,#a98242,#e1c27b);color:#172235;font-size:16px;font-weight:900;cursor:pointer}.customer-live-tracking{margin:10px 0;padding:12px;background:#192b35;border:1px solid #4d8668;border-radius:14px}.customer-live-tracking.hidden{display:none!important}</style>
+
+<style id="customer-design-system-v1">
+/* المرحلة 1: نظام ألوان وخطوط وأزرار موحّد لواجهة الزبون فقط */
+:root{
+  --brand:#d8b46a!important;
+  --brand-soft:#ecd49b!important;
+  --bg:#101827!important;
+  --ink:#f7f4ec!important;
+  --muted:#b9c2cf!important;
+  --card:#1a2638!important;
+  --line:#3a4b63!important;
+  --customer-gold:#d8b46a;
+  --customer-gold-light:#ecd49b;
+  --customer-navy:#101827;
+  --customer-panel:#1a2638;
+  --customer-border:#3a4b63;
+}
+html,body{
+  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif!important;
+  background:var(--customer-navy)!important;
+  color:var(--ink)!important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body{line-height:1.55}
+header{
+  background:linear-gradient(115deg,#101827,#1b2a40 58%,#101827)!important;
+  border-bottom:1px solid #43536a!important;
+  box-shadow:0 4px 18px #050b1466!important;
+}
+.location-chip{
+  background:#172338!important;
+  border:1px solid #43536a!important;
+  color:#f7f4ec!important;
+}
+.intro{
+  background:linear-gradient(125deg,#1a2638,#263b56)!important;
+  border:1px solid #455875!important;
+  color:#f7f4ec!important;
+}
+.intro .muted{color:#c4ccd7!important}
+.store-filter-tabs{
+  background:#172338!important;
+  border-color:#3a4b63!important;
+}
+.store-filter-tabs button{
+  color:#dce2ea!important;
+  border-color:transparent!important;
+  background:transparent!important;
+  font-family:inherit!important;
+  font-weight:750!important;
+}
+.store-filter-tabs button.active{
+  color:#172235!important;
+  background:linear-gradient(115deg,#b58d4b,#e4ca86)!important;
+  border-color:#e4ca86!important;
+}
+button{
+  font-family:inherit!important;
+  -webkit-tap-highlight-color:transparent;
+}
+.primary,#storeCartBar,
+#stores .store-card button,
+#productDetailPage button.primary,
+#cartView button.primary{
+  background:linear-gradient(115deg,#a98242,#e1c27b)!important;
+  color:#172235!important;
+  border:1px solid #e7cf97!important;
+  font-weight:850!important;
+  box-shadow:0 4px 12px #050b1455!important;
+}
+#customerSearchToggle,#customerBellBtn{
+  color:#ecd49b!important;
+  background:#1a2638!important;
+  border:1px solid #43536a!important;
+}
+.panel,#productDetailPage,
+#cartView #customDeliveryForm,
+#cartView #basketCheckoutPanel{
+  background:#1a2638!important;
+  border-color:#3a4b63!important;
+  color:#f7f4ec!important;
+}
+input,textarea,select{
+  font-family:inherit!important;
+  background:#111d2d!important;
+  border-color:#43536a!important;
+  color:#fff!important;
+}
+input::placeholder,textarea::placeholder{color:#8996a8!important}
+nav{
+  background:rgba(16,24,39,.97)!important;
+  border-top:1px solid #43536a!important;
+  box-shadow:0 -7px 22px #050b14aa!important;
+  backdrop-filter:blur(14px);
+}
+nav button{color:#aeb9c8!important;font-weight:700!important}
+nav button.active{
+  color:#f0d99e!important;
+  box-shadow:inset 0 3px 0 #d8b46a!important;
+}
+nav button[data-view="cart"] span{
+  background:#d8b46a!important;
+  color:#172235!important;
+}
+#ordersView .orders-filters button.active{
+  background:linear-gradient(115deg,#a98242,#e1c27b)!important;
+  border-color:#e1c27b!important;
+  color:#172235!important;
+}
+#ordersView .order-number>b,
+#ordersView .orders-page-title span{color:#ecd49b!important}
+a{color:#ecd49b}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid #ecd49b!important;
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:no-preference){
+  button,.panel,.store-card,.mini-store-card{
+    transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+  }
+  button:active{transform:scale(.985)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+</style>
+
 </body>
 </html>
