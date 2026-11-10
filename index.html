@@ -619,14 +619,19 @@ function renderStores(){
  document.querySelector(".all-stores-heading").textContent=category?"نتائج "+category:term?"نتائج البحث":"باقي المطاعم والمتاجر";
  renderProducts();
 }
-function productVisual(p){return p.image_url?`<img src="${p.image_url}" alt="${p.name}" loading="lazy" style="width:100%;height:130px;object-fit:cover;border-radius:12px;background:#333">`:`<div class="emoji">${p.emoji}</div>`}
+function productVisual(p,mode="list"){
+ const name=escapeHtml(p.name||"");
+ const fallback=escapeHtml(p.emoji||"🍽️");
+ const image=p.image_url?'<img src="'+String(p.image_url).replace(/&/g,"&amp;").replace(/"/g,"&quot;")+'" alt="'+name+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"";
+ return '<div class="product-visual product-visual--'+mode+'">'+image+'<div class="product-visual-fallback" '+(p.image_url?'hidden':'')+'>'+fallback+'</div></div>';
+}
 let activeStoreId=null,activeProductId=null,activeProductQty=1;
 async function openStore(id){const button=typeof event!=="undefined"?event?.currentTarget:null;if(button){button.disabled=true;button.dataset.oldText=button.textContent;button.textContent="جارٍ تحديث المنتجات...";}try{await loadCatalog();}finally{if(button){button.disabled=false;button.textContent=button.dataset.oldText||"عرض المنتجات";delete button.dataset.oldText;}}const s=storeBy(id);if(!s||!s.isOpen){alert("هذا المطعم مغلق حالياً.");return;}activeStoreId=id;document.getElementById("storeBrowseContent").classList.add("hidden");document.getElementById("storeDetailView").classList.remove("hidden");document.getElementById("detailStoreName").textContent=s.name;document.getElementById("detailStoreHero").innerHTML='<div class="detail-topline"><span style="color:#ff7626;font-size:23px">⌕</span><h2>'+escapeHtml(s.name)+'</h2><span style="color:#ff7626;font-size:23px">➜</span></div><div class="detail-cover">'+(storePhoto(s.coverImage,s.name,"detail-cover-photo")||escapeHtml(s.emoji||"🍽️"))+'</div><div class="detail-identity"><div class="detail-logo">'+(storePhoto(s.logoImage,s.name,"detail-logo-photo")||escapeHtml(s.emoji||"🍽️"))+'</div><div class="detail-name">'+escapeHtml(s.desc||s.type||"مطعم")+'</div></div><div class="detail-meta"><span>💰 التوصيل '+money(s.deliveryFee)+' ل.س</span><span>◷ التحضير '+s.prepMinutes+' دقيقة</span><span>'+(s.isOpen?"🟢 مفتوح":"🔴 مغلق")+'</span></div><div class="store-rating detail-store-rating">★ <b>'+(s.ratingCount?s.ratingAverage.toFixed(1):"جديد")+'</b> <small>'+(s.ratingCount?"من "+s.ratingCount+" تقييم":"لم يقيّم أحد هذا المطعم بعد")+'</small></div>';renderStoreCategories();document.getElementById("productDetailPage").classList.add("hidden");document.getElementById("storeDetailProducts").classList.remove("hidden");document.getElementById("productCategoryTabs").classList.remove("hidden");updateStoreCartBar();window.scrollTo({top:0,behavior:"smooth"});}
 function closeStoreDetail(){document.getElementById("storeDetailView").classList.add("hidden");document.getElementById("storeBrowseContent").classList.remove("hidden");activeStoreId=null;}
 function renderStoreCategories(){const list=products.filter(p=>p.store===activeStoreId),cats=[...new Set(list.map(p=>p.category||"عام"))];const tabs=document.getElementById("productCategoryTabs");tabs.innerHTML=cats.map((cat,i)=>`<button class="${i===0?"active":""}" onclick="selectProductCategory(this,${JSON.stringify(cat).replace(/"/g,"&quot;")})">${cat}</button>`).join("")||'<span class="muted">لا توجد منتجات بعد.</span>';renderStoreCategoryProducts(cats[0]||"");}
 function selectProductCategory(btn,cat){document.querySelectorAll("#productCategoryTabs button").forEach(b=>b.classList.toggle("active",b===btn));renderStoreCategoryProducts(cat);}
 function renderStoreCategoryProducts(cat){const arr=products.filter(p=>p.store===activeStoreId&&(p.category||"عام")===cat);document.getElementById("storeDetailProducts").innerHTML=arr.map(p=>`<article class="card" onclick="openProductDetail(${p.id})" style="cursor:pointer">${productVisual(p)}<h3>${p.name}</h3><p>${p.desc}</p><div class="price">${money(p.price)} ل.س</div></article>`).join("")||'<div class="panel empty">ما في منتجات بهالقائمة.</div>';}
-function openProductDetail(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;activeProductId=id;activeProductQty=1;document.getElementById("storeDetailProducts").classList.add("hidden");document.getElementById("productCategoryTabs").classList.add("hidden");const box=document.getElementById("productDetailPage");box.classList.remove("hidden");box.innerHTML=`<button class="small" onclick="backToStoreProducts()">← رجوع للأصناف</button>${productVisual(p)}<h2>${p.name}</h2><p>${p.desc||"لا يوجد وصف لهذا الصنف."}</p><p class="muted">المطعم: ${storeBy(p.store)?.name||""}</p><label>ملاحظات على الطلب</label><textarea id="productOrderNote" placeholder="مثلاً: بدون مخلل، زيادة ثوم..."></textarea><div class="row"><b>الكمية</b><div class="row"><button class="small" onclick="adjustDetailQty(-1)">−</button><b id="detailQty">1</b><button class="small" onclick="adjustDetailQty(1)">+</button></div></div><p class="price">سعر القطعة: ${money(p.price)} ل.س</p><button class="primary" style="width:100%" onclick="addDetailedProductToCart(${p.id})">إضافة للسلة</button>`;}
+function openProductDetail(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;activeProductId=id;activeProductQty=1;document.getElementById("storeDetailProducts").classList.add("hidden");document.getElementById("productCategoryTabs").classList.add("hidden");const box=document.getElementById("productDetailPage");box.classList.remove("hidden");box.innerHTML=`<button class="small" onclick="backToStoreProducts()">← رجوع للأصناف</button>${productVisual(p,"detail")}<h2>${p.name}</h2><p>${p.desc||"لا يوجد وصف لهذا الصنف."}</p><p class="muted">المطعم: ${storeBy(p.store)?.name||""}</p><label>ملاحظات على الطلب</label><textarea id="productOrderNote" placeholder="مثلاً: بدون مخلل، زيادة ثوم..."></textarea><div class="row"><b>الكمية</b><div class="row"><button class="small" onclick="adjustDetailQty(-1)">−</button><b id="detailQty">1</b><button class="small" onclick="adjustDetailQty(1)">+</button></div></div><p class="price">سعر القطعة: ${money(p.price)} ل.س</p><button class="primary" style="width:100%" onclick="addDetailedProductToCart(${p.id})">إضافة للسلة</button>`;}
 function backToStoreProducts(){document.getElementById("productDetailPage").classList.add("hidden");document.getElementById("storeDetailProducts").classList.remove("hidden");document.getElementById("productCategoryTabs").classList.remove("hidden");}
 function adjustDetailQty(n){activeProductQty=Math.max(1,Math.min(50,activeProductQty+n));document.getElementById("detailQty").textContent=activeProductQty;}
 function saveActiveCartToSavedBaskets(){if(!cart.length)return false;const sid=basketStoreId(cart);if(!sid){alert("تعذر حفظ السلة لأن منتجاتها ليست من مطعم واحد.");return false;}let target=savedBaskets.map((b,i)=>({b,i})).reverse().find(x=>String(x.b.store_id)===String(sid));if(target){const merged=target.b.items.map(x=>({...x}));for(const item of cart){const existing=merged.find(x=>String(x.id)===String(item.id)&&String(x.note||"")===String(item.note||""));if(existing)existing.qty=Number(existing.qty)+Number(item.qty);else merged.push({...item});}target.b.items=merged;target.b.date=new Date().toISOString();}else{const st=storeBy(Number(sid));savedBaskets.push({id:newCustomerUuid(),name:"سلة محفوظة — "+(st?.name||"المطعم"),store_id:Number(sid),date:new Date().toISOString(),items:cart.map(x=>({...x}))});}persistSavedBaskets();cart=[];save();renderCart();updateStoreCartBar();return true;}function goToSavedBaskets(){closeStoreDetail();showView("stores");const savedBtn=document.querySelector('[data-store-filter="saved"]');if(savedBtn)savedBtn.click();}function addDetailedProductToCart(productId){const p=products.find(x=>String(x.id)===String(productId));if(!p||!prepareCartForProduct(p))return;const note=(document.getElementById("productOrderNote").value||"").trim();const qty=Math.max(1,Math.min(50,Number(activeProductQty)||1));let it=cart.find(i=>String(i.id)===String(p.id)&&String(i.note||"")===note);if(it)it.qty=Number(it.qty)+qty;else cart.push({id:Number(p.id),qty,note});save();if(saveActiveCartToSavedBaskets()){alert("تمت إضافة "+p.name+" وحفظ السلة.");goToSavedBaskets();}}
@@ -1298,5 +1303,45 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 </style>
 
+<style id="customer-product-images-v3">
+/* Product photography: list thumbnails and dedicated detail hero */
+#storeDetailProducts .card>.product-visual{
+ grid-column:1;grid-row:1/4;width:112px;height:112px;min-width:112px;
+ overflow:hidden;border-radius:13px;background:linear-gradient(145deg,#202b3d,#35445a);
+ border:1px solid rgba(211,174,101,.22);display:grid;place-items:center;
+}
+#storeDetailProducts .card>.product-visual img,
+#storeDetailProducts .card>.product-visual .product-visual-fallback{
+ width:100%;height:100%;object-fit:cover;border-radius:inherit;
+}
+#storeDetailProducts .card>.product-visual .product-visual-fallback{
+ display:grid;place-items:center;font-size:42px;color:#e8d7b5;
+}
+#storeDetailProducts .card>.product-visual .product-visual-fallback[hidden]{display:none}
+#productDetailPage>.product-visual{
+ width:100%;height:clamp(220px,62vw,390px);max-height:390px;margin:14px 0 18px;
+ overflow:hidden;border-radius:20px;background:linear-gradient(145deg,#202b3d,#35445a);
+ border:1px solid rgba(211,174,101,.28);box-shadow:0 10px 28px rgba(0,0,0,.22);
+ display:grid;place-items:center;
+}
+#productDetailPage>.product-visual img,
+#productDetailPage>.product-visual .product-visual-fallback{
+ width:100%;height:100%;object-fit:cover;border-radius:inherit;
+}
+#productDetailPage>.product-visual .product-visual-fallback{
+ display:grid;place-items:center;font-size:76px;color:#e8d7b5;
+}
+#productDetailPage>.product-visual .product-visual-fallback[hidden]{display:none}
+#productDetailPage>h2{margin:8px 0 10px;font-size:clamp(21px,5vw,27px)}
+@media(max-width:380px){
+ #storeDetailProducts .card>.product-visual{width:96px;height:96px;min-width:96px}
+ #storeDetailProducts .card{grid-template-columns:96px minmax(0,1fr);column-gap:10px;padding:8px}
+}
+@media(prefers-reduced-motion:no-preference){
+ #storeDetailProducts .card>.product-visual img,
+ #productDetailPage>.product-visual img{transition:transform .28s ease}
+ #storeDetailProducts .card:active>.product-visual img{transform:scale(1.035)}
+}
+</style>
 </body>
 </html>
