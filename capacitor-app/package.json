@@ -4,15 +4,17 @@
   "private": true,
   "description": "Android wrapper for Delivery Alatarib web app",
   "scripts": {
-    "build:android": "npx cap sync android",
+    "build:android": "vite build",
     "open:android": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/push-notifications": "7.0.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
   }
 }
