@@ -640,6 +640,25 @@ function initCustomerTrackingMaps(){if(!window.L)return;document.querySelectorAl
 function showCustomerOrderTracking(orderId){const panel=document.getElementById("customer-track-panel-"+orderId);if(!panel)return;panel.classList.remove("hidden");initCustomerTrackingMaps();refreshCustomerDriverTracking();setTimeout(()=>{panel.scrollIntoView({behavior:"smooth",block:"center"});const map=customerTrackingMaps.get("customer-track-"+orderId);if(map)map.invalidateSize();},180);}
 let customerTrackingBusy=false;
 async function refreshCustomerDriverTracking(){if(customerTrackingBusy||!customerSession?.access_token)return;const active=orders.filter(o=>o.dbOrderId&&isCustomerOrderOnWay(o.status));if(!active.length)return;customerTrackingBusy=true;try{initCustomerTrackingMaps();const ids=active.map(o=>o.dbOrderId);const rows=await customerApi("rpc/get_customer_delivery_tracking",{method:"POST",body:JSON.stringify({p_order_ids:ids})});const byId=new Map((rows||[]).map(r=>[String(r.order_id),r]));for(const o of active){const key=String(o.dbOrderId),row=byId.get(key),map=customerTrackingMaps.get("customer-track-"+key),note=document.getElementById("customer-track-note-"+key);if(!map||!note)continue;if(!row||row.driver_latitude==null||row.driver_longitude==null){note.textContent="بانتظار تحديث موقع السائق. تأكد أن السائق فعّل GPS وفتح لوحة السائق.";continue;}const lat=Number(row.driver_latitude),lng=Number(row.driver_longitude);if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;let marker=customerDriverMarkers.get(key);if(!marker){marker=L.marker([lat,lng]).addTo(map).bindPopup("موقع سائق طلبك");customerDriverMarkers.set(key,marker);map.setView([lat,lng],16);}else{marker.setLatLng([lat,lng]);}note.textContent="آخر تحديث لموقع السائق: "+(row.location_updated_at?new Date(row.location_updated_at).toLocaleTimeString("ar"):"الآن")+" — يتم التحديث تلقائياً كل 15 ثانية.";setTimeout(()=>map.invalidateSize(),100);}}catch(e){console.warn("Customer live tracking error",e);}finally{customerTrackingBusy=false;}}
+// Keep the driver's marker live while the customer tracking panel is open.
+let customerTrackingPollerStarted=false;
+function startCustomerTrackingPoller(){
+ if(customerTrackingPollerStarted)return;
+ customerTrackingPollerStarted=true;
+ setInterval(()=>{
+  if(document.visibilityState!=="visible")return;
+  const openPanel=[...document.querySelectorAll(".customer-live-tracking")].some(el=>!el.classList.contains("hidden"));
+  if(openPanel)refreshCustomerDriverTracking();
+ },15000);
+ document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"){
+   const openPanel=[...document.querySelectorAll(".customer-live-tracking")].some(el=>!el.classList.contains("hidden"));
+   if(openPanel)refreshCustomerDriverTracking();
+  }
+ });
+}
+startCustomerTrackingPoller();
+
 let orderTrackingBusy=false;async function refreshOrderStatuses(){if(orderTrackingBusy||!orders.length)return;const active=orders.filter(o=>o.phone&&o.id&&!["تم التسليم","ملغي"].includes(o.status));if(!active.length)return;orderTrackingBusy=true;let changed=false;try{for(const o of active){try{const result=await api("rpc/track_delivery_order",{method:"POST",body:JSON.stringify({p_order_number:Number(o.id),p_customer_phone:String(o.phone).trim()})});if(result?.success&&result.status&&result.status!==o.status){const previous=o.status;o.status=result.status;changed=true;await addCustomerOrderStatusNotification(o.id,result.status,previous);}}catch(err){console.warn("تعذر تحديث حالة الطلب",o.id,err);}}if(changed){localStorage.setItem("ata_orders",JSON.stringify(orders));renderOrders();}}finally{orderTrackingBusy=false;}}
 
 // Custom delivery request flow
