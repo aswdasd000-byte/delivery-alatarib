@@ -357,6 +357,25 @@ nav button[data-view="cart"] span{background:#e9651c}
 <div class="footer">ديليفري الأتارب • نسخة تجريبية</div>
 </main>
 <script>
+/* Emergency navigation + runtime diagnostics */
+(function(){
+ window.addEventListener("error",function(e){
+  console.error("App startup/runtime error:",e.message,e.filename,e.lineno);
+  let box=document.getElementById("appRuntimeError");
+  if(!box){box=document.createElement("div");box.id="appRuntimeError";box.style.cssText="position:fixed;z-index:999999;bottom:72px;left:10px;right:10px;background:#7f1d1d;color:#fff;padding:10px 14px;border-radius:10px;font:14px sans-serif;direction:rtl";document.body.appendChild(box);}
+  box.textContent="صار خطأ بتشغيل التطبيق: "+(e.message||"خطأ غير معروف")+" — حدّث الصفحة.";
+ });
+ document.addEventListener("click",function(e){
+  const btn=e.target.closest("nav button[data-view]");
+  if(!btn)return;
+  const name=btn.dataset.view, target=document.getElementById(name+"View");
+  if(!target)return;
+  document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));
+  target.classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b===btn));
+  window.scrollTo(0,0);
+ },true);
+})();
 const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
 const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
 
