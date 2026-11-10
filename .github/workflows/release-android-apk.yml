@@ -69,6 +69,30 @@ jobs:
           printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
           python3 -m json.tool android/app/google-services.json > /dev/null
           npx cap sync android
+          # Configure the Google Services Gradle plugin required by Firebase Cloud Messaging.
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path("android/build.gradle")
+          app = Path("android/app/build.gradle")
+          if not root.exists() or not app.exists():
+              raise SystemExit("Generated Android Gradle files were not found")
+          rs = root.read_text()
+          plugin_line = "        classpath 'com.google.gms:google-services:4.4.2'"
+          if "com.google.gms:google-services" not in rs:
+              if "dependencies {" not in rs:
+                  raise SystemExit("Could not find root Gradle dependencies block")
+              rs = rs.replace("dependencies {", "dependencies {\\n" + plugin_line, 1)
+          root.write_text(rs)
+          aps = app.read_text()
+          if "com.google.gms.google-services" not in aps:
+              if "apply plugin: 'com.android.application'" in aps:
+                  aps = aps.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\\napply plugin: 'com.google.gms.google-services'", 1)
+              elif "plugins {" in aps:
+                  aps = aps.replace("plugins {", "plugins {\\n    id 'com.google.gms.google-services'", 1)
+              else:
+                  raise SystemExit("Could not find Android application plugin declaration")
+          app.write_text(aps)
+          PY
 
       - name: Generate branded Android app icon
         working-directory: capacitor-app
