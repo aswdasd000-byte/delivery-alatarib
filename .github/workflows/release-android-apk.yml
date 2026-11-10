@@ -55,9 +55,19 @@ jobs:
 
       - name: Install dependencies and generate Android project
         working-directory: capacitor-app
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           npm install
+          npm install @capacitor/push-notifications@latest-7
           npx cap add android
+          mkdir -p android/app
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::Missing GOOGLE_SERVICES_JSON_BASE64 repository secret"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          python3 -m json.tool android/app/google-services.json > /dev/null
           npx cap sync android
 
       - name: Generate branded Android app icon
