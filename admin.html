@@ -432,22 +432,7 @@ function exportSettlementStatement(party,payments){
  const money=v=>Math.round(Number(v)||0);
  const rows=[["كشف حساب",party.name],["إجمالي المستحق",money(party.due)],["الطلبات"],["رقم الطلب","التاريخ","التفاصيل","المستحق"],...party.orders.map(o=>[o.number,new Date(o.date).toLocaleString("ar"),o.description,money(o.amount)]),["الدفعات"],["التاريخ","المبلغ","الملاحظة"],...payments.map(p=>[new Date(p.paid_at).toLocaleString("ar"),money(p.amount_syp),p.note||""])];
  const table=rows.map((r,i)=>"<tr>"+r.map(c=>"<td>"+esc(String(c??""))+"</td>").join("")+"</tr>").join("");
- const html='<html><head><meta charset="UTF-8"></head><body><table dir="rtl" border="1">'+table+"</table><script>
-(function(){
- const btn=document.getElementById("panelSwitchBtn"),menu=document.getElementById("panelSwitchMenu");if(!btn||!menu)return;
- btn.addEventListener("click",()=>{const open=menu.classList.toggle("hidden")===false;btn.setAttribute("aria-expanded",String(open));});
- document.addEventListener("click",e=>{if(!e.target.closest(".panel-switch-wrap")){menu.classList.add("hidden");btn.setAttribute("aria-expanded","false");}});
- let checkedUser="";
- async function updatePanelSwitch(){
-  const s=(typeof session!=="undefined"?session:null),u=s&&s.user;if(!u||!u.id||!s.access_token)return;if(checkedUser===u.id)return;checkedUser=u.id;
-  const role=String(u.app_metadata&&u.app_metadata.role||"").toLowerCase().trim();const allowed={admin:role==="admin",restaurant:false,driver:false};
-  if(role==="store"){try{const r=await fetch("https://apreejawamptetdflwcf.supabase.co/rest/v1/store_staff?select=store_id&user_id=eq."+encodeURIComponent(u.id),{headers:{apikey:"sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7",Authorization:"Bearer "+s.access_token}});const rows=await r.json();allowed.restaurant=r.ok&&Array.isArray(rows)&&rows.length>0;}catch(e){}}
-  if(role==="driver"){try{const r=await fetch("https://apreejawamptetdflwcf.supabase.co/rest/v1/delivery_staff?select=active&user_id=eq."+encodeURIComponent(u.id),{headers:{apikey:"sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7",Authorization:"Bearer "+s.access_token}});const rows=await r.json();allowed.driver=r.ok&&Array.isArray(rows)&&rows.some(x=>x.active===true);}catch(e){}}
-  menu.querySelector('[data-panel="admin"]').classList.toggle("hidden",!allowed.admin);menu.querySelector('[data-panel="restaurant"]').classList.toggle("hidden",!(allowed.admin||allowed.restaurant));menu.querySelector('[data-panel="driver"]').classList.toggle("hidden",!(allowed.admin||allowed.driver));
- }
- setInterval(updatePanelSwitch,700);
-})();
-</script></body></html>";
+ const html='<!doctype html><html><head><meta charset="UTF-8"></head><body><table dir="rtl" border="1">'+table+'</table></body></html>';
  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"});
  const url=window.URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download="كشف-حساب-"+String(party.name).replace(/[^\u0600-\u06FF\w-]/g,"-")+".xls";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>window.URL.revokeObjectURL(url),3000);
