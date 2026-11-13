@@ -192,7 +192,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:pan-y}#storeD
 </style>
 </head>
 <body>
-<header><div class="header-top"><button type="button" id="customerSearchToggle" aria-label="البحث" title="البحث عن مطعم أو صنف" style="background:transparent;color:white;font-size:23px;padding:3px;flex:0 0 34px">⌕</button><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button><button type="button" id="customerBellBtn" aria-label="الإشعارات" title="الإشعارات" style="background:transparent;color:white;font-size:22px;padding:3px;flex:0 0 34px">🔔</button><div id="customerSearchPanel" class="notification-panel hidden" style="top:46px"><input id="customerSearchInput" type="search" placeholder="ابحث عن مطعم أو صنف..." autocomplete="off" style="margin:0"><p class="muted" style="margin:8px 2px 0">اكتب اسم المطعم أو المنتج لتظهر النتائج مباشرة.</p></div><div id="customerNotificationsPanel" class="notification-panel hidden" aria-live="polite"><div class="row"><b>🔔 إشعاراتك</b><button type="button" id="closeCustomerNotifications" class="small">إغلاق ✕</button></div><div id="customerNotificationsList" class="muted" style="margin-top:10px">جارٍ تحميل الإشعارات...</div><div class="notification-actions"><button type="button" id="enableCustomerNotifications" class="primary small">تفعيل إشعارات الطلبات</button><button type="button" id="clearCustomerNotifications" class="small">مسح السجل</button></div></div></div>
+<header><div class="header-top"><div class="customer-panel-switch" id="customerPanelSwitch" style="display:none;position:relative;flex:0 0 auto"><button id="customerPanelSwitchBtn" type="button" style="background:#202020;color:#fff;padding:7px 9px;font-size:12px;font-weight:800">⇄ اللوحات</button><div id="customerPanelSwitchMenu" class="hidden" style="position:absolute;top:43px;right:0;z-index:100;min-width:190px;background:#202a3a;border:1px solid #c7a45b;border-radius:12px;padding:7px;box-shadow:0 10px 25px #0009"><a data-panel="admin" href="./admin.html" class="hidden" style="display:block;padding:10px;color:#fff;text-decoration:none">👑 لوحة المدير</a><a data-panel="restaurant" href="./restaurant.html" class="hidden" style="display:block;padding:10px;color:#fff;text-decoration:none">🏪 لوحة المطعم</a><a data-panel="driver" href="./driver.html" class="hidden" style="display:block;padding:10px;color:#fff;text-decoration:none">🛵 لوحة السائق</a></div></div><button type="button" id="customerSearchToggle" aria-label="البحث" title="البحث عن مطعم أو صنف" style="background:transparent;color:white;font-size:23px;padding:3px;flex:0 0 34px">⌕</button><button type="button" class="location-chip" id="homeLocationToggle" aria-expanded="false" style="border:0;cursor:pointer">📍 <span id="homeLocationLabel">موقعك الحالي</span>　⌄</button><button type="button" id="customerBellBtn" aria-label="الإشعارات" title="الإشعارات" style="background:transparent;color:white;font-size:22px;padding:3px;flex:0 0 34px">🔔</button><div id="customerSearchPanel" class="notification-panel hidden" style="top:46px"><input id="customerSearchInput" type="search" placeholder="ابحث عن مطعم أو صنف..." autocomplete="off" style="margin:0"><p class="muted" style="margin:8px 2px 0">اكتب اسم المطعم أو المنتج لتظهر النتائج مباشرة.</p></div><div id="customerNotificationsPanel" class="notification-panel hidden" aria-live="polite"><div class="row"><b>🔔 إشعاراتك</b><button type="button" id="closeCustomerNotifications" class="small">إغلاق ✕</button></div><div id="customerNotificationsList" class="muted" style="margin-top:10px">جارٍ تحميل الإشعارات...</div><div class="notification-actions"><button type="button" id="enableCustomerNotifications" class="primary small">تفعيل إشعارات الطلبات</button><button type="button" id="clearCustomerNotifications" class="small">مسح السجل</button></div></div></div>
 <div id="homeLocationPanel" class="panel hidden" style="margin:10px 0 0;background:#242424;text-align:right">
  <button type="button" class="primary" id="useCurrentLocationBtn" style="width:100%;background:#4165df">🎯 استخدام موقعي الحالي</button>
  <p id="homeLocationStatus" class="muted" aria-live="polite">حدد موقعك ليسهل توصيل طلباتك.</p>
@@ -416,6 +416,33 @@ nav button[data-view="cart"] span{background:#e9651c}
 })();
 const SUPABASE_URL="https://apreejawamptetdflwcf.supabase.co";
 const SUPABASE_KEY="sb_publishable_amN_E9EIKrjl_fk-ndm1YA_R7mI24j7";
+(function(){
+ const wrap=document.getElementById("customerPanelSwitch"),btn=document.getElementById("customerPanelSwitchBtn"),menu=document.getElementById("customerPanelSwitchMenu");
+ if(!wrap||!btn||!menu)return;
+ btn.addEventListener("click",()=>menu.classList.toggle("hidden"));
+ document.addEventListener("click",e=>{if(!e.target.closest("#customerPanelSwitch"))menu.classList.add("hidden")});
+ const base=SUPABASE_URL,key=SUPABASE_KEY;
+ function read(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}}
+ async function check(){
+  const admin=read("delivery_admin_session_v1"),store=read("delivery_restaurant_session_v1"),driver=read("delivery_driver_session_v1");
+  const links={admin:false,restaurant:false,driver:false};
+  if(admin&&admin.user&&admin.user.app_metadata&&admin.user.app_metadata.role==="admin")links.admin=true;
+  async function rows(s,table,select){
+   if(!s||!s.user||!s.access_token)return [];
+   try{const r=await fetch(base+"/rest/v1/"+table+"?select="+select+"&user_id=eq."+encodeURIComponent(s.user.id),{headers:{apikey:key,Authorization:"Bearer "+s.access_token}});return r.ok?await r.json():[]}catch(e){return []}
+  }
+  if(store&&store.user&&store.user.app_metadata&&store.user.app_metadata.role==="store"){
+   const a=await rows(store,"store_staff","store_id");links.restaurant=a.length>0;
+  }
+  if(driver&&driver.user&&driver.user.app_metadata&&driver.user.app_metadata.role==="driver"){
+   const a=await rows(driver,"delivery_staff","active");links.driver=a.some(x=>x.active===true);
+  }
+  for(const role of ["admin","restaurant","driver"])menu.querySelector('[data-panel="'+role+'"]').classList.toggle("hidden",!links[role]);
+  wrap.style.display=Object.values(links).some(Boolean)?"block":"none";
+ }
+ check();setInterval(check,5000);
+})();
+
 function safeReadJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback;}catch(err){console.warn("تجاهلنا بيانات محلية تالفة:",key,err);try{localStorage.removeItem(key);}catch{}return fallback;}}
 
 function urlBase64ToUint8Array(base64String){const padding="=".repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(base64);return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));}
