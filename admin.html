@@ -242,7 +242,7 @@ async function saveStoreBrandingImage(id,kind){
  const input=document.getElementById((kind==="logo"?"storeLogoFile":"storeCoverFile")+id);
  const file=input?.files?.[0];
  if(!file){alert(kind==="logo"?"اختر صورة الشعار أولاً.":"اختر صورة الغلاف أولاً.");return;}
- const button=input.parentElement.querySelector('button[onclick="saveStoreBrandingImage('+id+',\\''+kind+'\\')"]');
+ const button=Array.from(document.querySelectorAll("#storeList button")).find(b=>b.getAttribute("onclick")==="saveStoreBrandingImage("+id+",'"+kind+"')");
  if(button)button.disabled=true;
  try{
   const url=await uploadStoreImage(file,id,kind);
