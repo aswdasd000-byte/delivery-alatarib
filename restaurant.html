@@ -226,7 +226,7 @@ async function loadRestaurantProducts(){
  box.innerHTML='<p class="muted">جارٍ تحميل المنتجات...</p>';
  try{
   const rows=await api("products?select=id,name,category,description,price_syp,emoji,is_available,image_url&store_id=eq."+encodeURIComponent(currentStoreId)+"&order=name");
-  box.innerHTML=rows.map(p=>'<div class="product-row">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:10px">':'<span style="font-size:28px">'+esc(p.emoji||"🍽️")+'</span>')+'<div class="product-info"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.category||"عام")+' • '+esc(p.price_syp)+' ل.س • '+(p.is_available?'متوفر للطلب':'نفد من المخزون')+'</div>'+(p.description?'<div class="muted">'+esc(p.description)+'</div>':'')+'</div><div class="product-actions"><button type="button" onclick="editRestaurantProduct('+p.id+')">تعديل</button><button type="button" class="'+(p.is_available?'danger':'')+'" onclick="toggleRestaurantProduct('+p.id+','+(!p.is_available)+')">'+(p.is_available?'نفد من المخزون':'إعادة التوفر')+'</button></div></div>').join("")||'<p class="muted">ما أضفت أي منتجات لهالمطعم لسا.</p>';
+  box.innerHTML=rows.map(p=>'<div class="product-row">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:10px">':'<span style="font-size:28px">'+esc(p.emoji||"🍽️")+'</span>')+'<div class="product-info"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.category||"عام")+' • '+esc(p.price_syp)+' ل.س • '+(p.is_available?'متوفر للطلب':'نفد من المخزون')+'</div>'+(p.description?'<div class="muted">'+esc(p.description)+'</div>':'')+'<label>تغيير صورة المنتج</label><input type="file" accept="image/jpeg,image/png,image/webp" id="restaurantProductImage'+Number(p.id)+'" onchange="previewProductImage(this,\'restaurantProductPreview'+Number(p.id)+'\')"><img id="restaurantProductPreview'+Number(p.id)+'" src="'+esc(p.image_url||"")+'" class="'+(p.image_url?"":"hidden")+'" style="width:90px;height:90px;object-fit:cover;border-radius:12px;margin:5px 0"><button type="button" onclick="saveRestaurantProductImage('+Number(p.id)+')">💾 حفظ صورة المنتج</button></div><div class="product-actions"><button type="button" onclick="editRestaurantProduct('+p.id+')">تعديل</button><button type="button" class="'+(p.is_available?'danger':'')+'" onclick="toggleRestaurantProduct('+p.id+','+(!p.is_available)+')">'+(p.is_available?'نفد من المخزون':'إعادة التوفر')+'</button></div></div>').join("")||'<p class="muted">ما أضفت أي منتجات لهالمطعم لسا.</p>';
  }catch(e){box.innerHTML='<p class="muted">تعذر تحميل المنتجات: '+esc(e.message||"خطأ")+'</p>';}
 }
 document.getElementById("saveStoreProductImageBtn").addEventListener("click",()=>document.getElementById("addStoreProductBtn").click());
@@ -243,13 +243,26 @@ document.getElementById("addStoreProductBtn").addEventListener("click",async()=>
   document.getElementById("storeProductImagePreview").classList.add("hidden");s.textContent="تمت إضافة المنتج مع صورته وحفظه بنجاح.";await loadRestaurantProducts();
  }catch(e){s.textContent="تعذر إضافة المنتج: "+(e.message||"خطأ");}finally{b.disabled=false;}
 });
+async function saveRestaurantProductImage(id){
+ const input=document.getElementById("restaurantProductImage"+id);const file=input?.files?.[0];if(!file){alert("اختر صورة المنتج أولاً.");return;}
+ const button=input.parentElement.querySelector('button[onclick="saveRestaurantProductImage('+id+')"]');if(button)button.disabled=true;
+ try{const image_url=await uploadRestaurantImage(file,"product",id);await api("products?id=eq."+encodeURIComponent(id)+"&store_id=eq."+encodeURIComponent(currentStoreId),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({image_url})});await loadRestaurantProducts();const s=document.getElementById("storeProductStatus");if(s)s.textContent="تم تحديث صورة المنتج بنجاح.";}
+ catch(e){alert("تعذر حفظ صورة المنتج: "+(e.message||"خطأ"));}
+ finally{if(button)button.disabled=false;}
+}
+function previewProductImage(input,previewId){
+ const preview=document.getElementById(previewId),file=input?.files?.[0];if(!preview)return;
+ if(!file){preview.classList.toggle("hidden",!preview.src);return;}
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){alert("اختر صورة JPG أو PNG أو WEBP حتى 5 ميغابايت.");input.value="";return;}
+ preview.src=URL.createObjectURL(file);preview.classList.remove("hidden");
+}
 async function toggleRestaurantProduct(id,available){
  try{await api("products?id=eq."+encodeURIComponent(id)+"&store_id=eq."+encodeURIComponent(currentStoreId),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({is_available:available})});await loadRestaurantProducts();}
  catch(e){alert("تعذر تغيير توفر المنتج: "+(e.message||"خطأ"));}
 }
 async function editRestaurantProduct(id){
  try{
-  const rows=await api("products?select=id,name,category,description,price_syp,emoji&store_id=eq."+encodeURIComponent(currentStoreId)+"&id=eq."+encodeURIComponent(id)),p=rows[0];if(!p)throw Error("المنتج غير موجود.");
+  const rows=await api("products?select=id,name,category,description,price_syp,emoji,image_url&store_id=eq."+encodeURIComponent(currentStoreId)+"&id=eq."+encodeURIComponent(id)),p=rows[0];if(!p)throw Error("المنتج غير موجود.");
   const name=prompt("اسم المنتج:",p.name);if(name===null)return;if(!name.trim())throw Error("اسم المنتج مطلوب.");
   const category=prompt("تصنيف المنتج:",p.category||"عام");if(category===null)return;
   const priceRaw=prompt("السعر بالليرة السورية:",String(p.price_syp));if(priceRaw===null)return;const price=Number(priceRaw);if(!Number.isSafeInteger(price)||price<1)throw Error("السعر غير صحيح.");
